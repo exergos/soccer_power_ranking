@@ -1,0 +1,106 @@
+{% load staticfiles %}
+{#This import css file (static)#}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+<html>
+<head>
+    {#JQuery for basic tools#}
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    {#Tablesorter to make table sortable via columns#}
+    {#Added locally as a static file#}
+    <script src="{% static "js/tablesorter/jquery-latest.js" %}"></script>
+    <script src="{% static "js/tablesorter/jquery.tablesorter.js" %}"></script>
+    {#Google Charts#}
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    {#Script to load tablesorter, create charts and fill table#}
+    <script type="text/javascript">
+        {#On document ready, load stuff#}
+        $(document).ready(function()
+                {
+                    $("#spi_ranking").tablesorter();
+                }
+        );
+
+        google.load("visualization", "1", {packages:["corechart"]});
+        google.setOnLoadCallback(drawChart);
+        function drawChart() {
+            {#Create div's for charts#}
+            for (i = 0;i<16;i++) {
+                var id_name = 'chart_div' +String(i);
+                var div =     $('<div/>',{
+                    id: id_name
+                });
+                {#This adds chart as a column for each row#}
+                $('#spi_ranking').find('tbody').find('tr').eq(i).find('td').eq(3).after(div);
+            }
+            {#Create charts#}
+            {#Customize chart using options#}
+            {#https://developers.google.com/chart/interactive/docs/customizing_axes#}
+            var options = {
+                vAxis: {
+                    gridlines: {
+                        color: 'transparent'
+                    }
+                },
+                'chartArea': {'width': '100%'},
+                legend: {position: 'none'},
+                hAxis: {title: 'none'}
+            };
+
+            var chart = [];
+            var number_of_charts = 0;
+            {% for spi_chart_i in spi_chart %}
+                var djangoData = {{ spi_chart_i |safe }};
+
+                {#Add color data to chart#}
+                djangoData[0].push({ role: 'style' });
+                for (i = 1; i <= 16; i++) {
+                    {#If i smaller than 12, these are league positions 7-16 (i.e. out of playoffs)#}
+                    if (i < 11) {
+                        if (i < 3) {
+                            {#Play-off 3#}
+                            djangoData[i].push('red');
+                        }
+                        else {
+                            {#Play-off 2#}
+                            djangoData[i].push('blue');
+                        }
+                    }
+                    else {
+                        {#Play-off 1#}
+                        djangoData[i].push('green');
+                    }
+                }
+                var data = google.visualization.arrayToDataTable(djangoData);
+                chart[number_of_charts] = new google.visualization.ColumnChart(document.getElementById('chart_div' +String(number_of_charts)));
+                chart[number_of_charts].draw(data, options);
+                number_of_charts = number_of_charts + 1;
+            {%  endfor %}
+        }
+    </script>
+</head>
+<body>
+<ul>
+    <table cellspacing='0' id="spi_ranking" class="tablesorter">
+        {#Make table headers#}
+        <thead>
+        <tr>
+            {% for header in spi_table_headers %}
+                <th>{{ header }}</th>
+            {% endfor %}
+            <th>Projected League Finish</th>
+        </tr>
+        </thead>
+        {#Fill rest of table with data#}
+        <tbody>
+        {% for values in spi_table_values %}
+            <tr>
+                {% for value in values %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</ul>
+</body>
+</html>
