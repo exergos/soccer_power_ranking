@@ -19,11 +19,12 @@ __project__ = 'SPI_JupilerProLeague'
 
 # Returns a list of 2 items
 # [0]:  Team names of all teams in Jupiler Pro League
-# [1]:  Array of size (games played x 4)
-# [1][:,0]: Home Team (As a number, alphabetically as in [0]
+# [1]:  Array of size (total games x 4)
+#       [1][:,0]: Home Team (As a number, alphabetically as in [0]
 #       [1][:,1]: Away Team (As a number, alphabetically as in [0]
 #       [1][:,2]: Home Team Goals
 #       [1][:,3]: Away Team Goals
+#       [1][:,4]: Game already played (1 = yes, 0 = no)
 
 ########################################################################################################################
 ########################################################################################################################
@@ -46,11 +47,11 @@ def get_data():
     score_away = []
     games_played = []
 
-    scores_raw = soup[0].find_all("a", class_=["finished", "upcoming"])
+    scores_raw = soup[0].find_all("a", class_=["finished", "upcoming","in_play"])
     number_of_teams = 1
     for i in range(len(scores_raw)):
         if scores_raw[i]['class'][0] == "finished" and (
-            '/' not in scores_raw[i].getText()):  # Second part is to eliminate postponed games
+                    '/' not in scores_raw[i].getText()):  # Second part is to eliminate postponed games
             games_played.append(i)
             team_home.append(scores_raw[i].parent.parent.find("abbr")["title"])
             score_home.append(float(scores_raw[i].getText().replace('\n', '').split('-')[0]))
@@ -88,6 +89,31 @@ def get_data():
     game_data[:, 1] = team_away
     game_data[:, 2] = score_home
     game_data[:, 3] = score_away
+
+    # Expand game_data to include games not played!
+    # Extra rows for games not played, extra column(4) for information about game (1 = played, 0 = not played)
+    # Define some parameters that will help with reading the code
+    total_games = number_of_teams * (number_of_teams - 1)
+    games_played = len(game_data)
+    games_not_played = total_games - games_played
+
+    game_data = np.r_[game_data, np.zeros((games_not_played, game_data.shape[1]))]
+    game_data = np.c_[game_data, np.zeros((total_games, 1))]
+    count = 0
+    for i in range(number_of_teams):  # Home Team
+        for j in range(number_of_teams):  # Away Team
+            played = 0
+            if (i is not j):
+                # Check to see if played
+                for k in range(games_played):
+                    if game_data[k, 0] == i and game_data[k, 1] == j:
+                        played = 1
+                        game_data[k, 4] = played
+                if played == 0:
+                    game_data[games_played + count, 0] = i
+                    game_data[games_played + count, 1] = j
+                    game_data[games_played + count, 4] = played
+                    count = count + 1
 
     # What does module return?
     return list([teams, game_data])
