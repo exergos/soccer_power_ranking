@@ -1,4 +1,7 @@
+{#Import static files (images/css/js/...):#}
 {% load staticfiles %}
+{#Import custom made template tags and filters:#}
+{% load app_soccer_power_ranking_extra_templates %}
 {#This import css file (static)#}
 <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
 <html>
@@ -24,20 +27,6 @@
         google.load("visualization", "1", {packages:["corechart"]});
         google.setOnLoadCallback(drawChart);
         function drawChart() {
-            {#Create div's for charts#}
-            for (i = 0;i<16;i++) {
-                var id_name_spi = 'chart_div_spi' +String(i);
-                var id_name_elo = 'chart_div_elo' +String(i);
-                var div_spi =     $('<div/>',{
-                    id: id_name_spi
-                });
-                var div_elo =     $('<div/>',{
-                    id: id_name_elo
-                });
-                {#This adds chart as a column for each row#}
-                $('#spi_ranking').find('tbody').find('tr').eq(i).find('td').eq(3).after(div_spi);
-                $('#elo_ranking').find('tbody').find('tr').eq(i).find('td').eq(1).after(div_elo);
-            }
             {#Create charts#}
             {#Customize chart using options#}
             {#https://developers.google.com/chart/interactive/docs/customizing_axes#}
@@ -77,10 +66,39 @@
                     }
                 }
                 var data_spi = google.visualization.arrayToDataTable(djangoData_spi);
-                chart_spi[number_of_charts_spi] = new google.visualization.ColumnChart(document.getElementById('chart_div_spi' +String(number_of_charts_spi)));
+                var id_name_spi = 'chart_div_spi' +String(number_of_charts_spi);
+
+                // Create div (needed to make chart, later changed to image)
+                var div_spi = document.createElement('div');
+                div_spi.id = id_name_spi;
+
+                // Create chart object
+                chart_spi[number_of_charts_spi] = new google.visualization.ColumnChart(div_spi);
+
+                // Wait for the chart to finish drawing before calling the getImageURI() method.
+                // This makes image (PNG) of chart instead of object
+                google.visualization.events.addListener(chart_spi[number_of_charts_spi], 'ready', function () {
+                    div_spi.innerHTML = '<img src="' + chart_spi[number_of_charts_spi].getImageURI() + '">';
+                    console.log(div_spi.innerHTML);
+                });
+
+                // Draw chart command
                 chart_spi[number_of_charts_spi].draw(data_spi, options);
+
+                // Inside chart div is the img object
+                var google_chart_img = div_spi.children[0];
+                google_chart_img.className = "chart"
+
+                // Put it inside td as an extra column in table
+                // Use outerHTML to get html string of image
+                $('#spi_ranking').find('tbody').find('tr').eq(number_of_charts_spi).find('td').eq(3).after('<td>' + google_chart_img.outerHTML + '</td>');
+
+                // Go to next chart
                 number_of_charts_spi = number_of_charts_spi + 1;
+
             {%  endfor %}
+
+
 
             var chart_elo = [];
             var number_of_charts_elo = 0;
@@ -115,50 +133,54 @@
     </script>
 </head>
 <body>
-<ul>
-    <table cellspacing='0' id="spi_ranking" class="tablesorter">
-        {#Make table headers#}
-        <thead>
-        <tr>
-            {% for header in spi_table_headers %}
-                <th>{{ header }}</th>
-            {% endfor %}
-            <th>Projected League Finish</th>
-        </tr>
-        </thead>
-        {#Fill rest of table with data#}
-        <tbody>
-        {% for values in spi_table_values %}
-            <tr>
-                {% for value in values %}
-                    <td>{{ value }}</td>
-                {% endfor %}
-            </tr>
+<table cellspacing='0' id="spi_ranking" class="tablesorter">
+    {#Make table headers#}
+    <thead>
+    <tr>
+        {% for header in spi_table_headers %}
+            <th>{{ header }}</th>
         {% endfor %}
-        </tbody>
-    </table>
+        <th>Pro</th>
+    </tr>
+    </thead>
+    {#Fill rest of table with data#}
+    <tbody>
+    {% for values in spi_table_values %}
+        <tr>
+            {% for value in values %}
+                {% if forloop.first %}
+                    <td><img src="{% static ""%}{{ team_logo_links|get_at_index:forloop.parentloop.counter0 }}" height="20" width="20"/>&nbsp;{{ value }}</td>
+                {% else %}
+                    <td>{{ value }}</td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 
-    <table cellspacing='0' id="elo_ranking" class="tablesorter">
-        {#Make table headers#}
-        <thead>
-        <tr>
-            {% for header in elo_table_headers %}
-                <th>{{ header }}</th>
-            {% endfor %}
-            <th>Projected League Finish</th>
-        </tr>
-        </thead>
-        {#Fill rest of table with data#}
-        <tbody>
-        {% for values in elo_table_values %}
-            <tr>
-                {% for value in values %}
-                    <td>{{ value }}</td>
-                {% endfor %}
-            </tr>
+
+
+<table cellspacing='0' id="elo_ranking" class="tablesorter">
+    {#Make table headers#}
+    <thead>
+    <tr>
+        {% for header in elo_table_headers %}
+            <th>{{ header }}</th>
         {% endfor %}
-        </tbody>
-    </table>
-</ul>
+        <th>Projected League Finish</th>
+    </tr>
+    </thead>
+    {#Fill rest of table with data#}
+    <tbody>
+    {% for values in elo_table_values %}
+        <tr>
+            {% for value in values %}
+                <td>{{ value }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 </body>
 </html>

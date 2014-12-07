@@ -1,6 +1,5 @@
 from django.shortcuts import render
 # Create your views here.
-
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -88,8 +87,17 @@ def index(request):
     for team in range(len(elo_chart)):
         elo_chart[team] = json.dumps(elo_chart[team], cls=DecimalEncoder)
 
+    # Create links to images (team logos)
+    team_logo_links = list()
+    for i in range(len(spi_table_values)):
+        # team_logo_links.append("{% static \"static/images/Team Logos/" + spi_table_values[i][0] + ".png\" %}")
+        team_logo_links.append("images/Team Logos/" + spi_table_values[i][0] + ".png")
+
+
+
     context_dict = {'spi_table_headers': spi_table_headers, 'spi_table_values': spi_table_values, 'spi_chart': spi_chart,
-                    'elo_table_headers': elo_table_headers, 'elo_table_values': elo_table_values, 'elo_chart': elo_chart  }
+                    'elo_table_headers': elo_table_headers, 'elo_table_values': elo_table_values, 'elo_chart': elo_chart,
+                    'team_logo_links' : team_logo_links}
 
 
     return render(request, 'app_soccer_power_ranking/index.html', context_dict)
