@@ -87,12 +87,11 @@ def GameMinute():
                 index_end_result = int(games_per_minute[i][j][k,1]) + 1
                 output[index_goal_difference][index_end_result][k][0] = output[index_goal_difference][index_end_result][k][0] + 1
 
-    # Make percentage chances of all occurences
+    # Make percentage chances of all occurrences
     for i in range((goal_difference*2+1)):
         for j in range(minutes):
             # For game situation i and j, give all matches
             matches = output[i][0][j][0] + output[i][1][j][0] + output[i][2][j][0]
-            print(matches)
             if matches == 0:
                 for k in range(3):
                     output[i][k][j][0] = 0

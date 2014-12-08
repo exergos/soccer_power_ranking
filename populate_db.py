@@ -10,6 +10,7 @@ def populate():
     django.setup()
     spi_data.objects.all().delete()
     elo_data.objects.all().delete()
+    game_situations.objects.all().delete()
 
     # SPI CALCULATION HERE
     # Algorithm to get data from sporza and calculate spi and league finish percentage chances
@@ -49,10 +50,29 @@ def populate():
 
         elo_data.objects.create(**d_elo)
 
+    # Add Game Situation Data
+    from app_soccer_power_ranking.algorithms.GameMinute_algorithm import GameMinute
+    output = GameMinute()
+
+    # Fill Database
+
+    for i in range(len(output)): #delta (goal difference)
+        for j in range(len(output[0])): # game result
+            for k in range(len(output[0][0])): #minutes
+                # d is dictionary of field names and values
+                d_game_situations = {'minute' : k+1,
+                                     'delta' : i-(len(output)-1)/2,
+                                     'result' : j-1,
+                                     'home_win_chance' : output[i][2][k][0],
+                                     'tie_chance' :output[i][1][k][0],
+                                     'away_win_chance' : output[i][0][k][0]}
+                game_situations.objects.create(**d_game_situations)
+
 # Start execution here!
 if __name__ == '__main__':
     print("Starting Soccer Power Ranking database population script...")
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_soccer_power_ranking.settings')
     from app_soccer_power_ranking.models import spi_data
     from app_soccer_power_ranking.models import elo_data
+    from app_soccer_power_ranking.models import game_situations
     populate()

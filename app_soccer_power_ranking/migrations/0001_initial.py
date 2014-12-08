@@ -42,7 +42,6 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, primary_key=True, auto_created=True)),
                 ('Team', models.CharField(max_length=30)),
-                ('Test', models.CharField(max_length=30)),
                 ('SPI', models.DecimalField(decimal_places=2, max_digits=65)),
                 ('off_rating', models.DecimalField(decimal_places=2, max_digits=65)),
                 ('def_rating', models.DecimalField(decimal_places=2, max_digits=65)),
