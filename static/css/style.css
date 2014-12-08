@@ -1,3 +1,13 @@
+/*Loading*/
+#loading {
+    position:         absolute;
+    left:             0px;
+    top:              0px;
+    background-color: #ddd;
+    /* ... */
+}
+
+/*Chart*/
 .chart{
     vertical-align: middle;
     width: 50;
