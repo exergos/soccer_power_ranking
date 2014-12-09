@@ -1,5 +1,4 @@
 __author__ = 'Exergos'
-__project__ = 'SPI_JupilerProLeague'
 
 ########################################################################################################################
 ########################################################################################################################
@@ -9,14 +8,15 @@ __project__ = 'SPI_JupilerProLeague'
 #########################
 
 # This Scrape file gets Jupiler Pro League results data from sporza.be
-# Python 3.4 as Interpreter
+# Compared to "sporza.py" it gets data from all seasons, including goal minutes
+# Python 3.3 as Interpreter
 # BeautifulSoup to Scrape
 # Numpy for Array use
 
 ######################
 # What does it return?
 ######################
-
+# If sporza_small() is called (algorithm="spi" or "elo"):
 # Returns a list of 2 items
 # [0]:  Team names of all teams in Jupiler Pro League
 # [1]:  Array of size (total games x 4)
@@ -26,10 +26,188 @@ __project__ = 'SPI_JupilerProLeague'
 #       [1][:,3]: Away Team Goals
 #       [1][:,4]: Game already played (1 = yes, 0 = no)
 
-########################################################################################################################
-########################################################################################################################
+# If sporza_big(number_of_seasons) is called:
+# output[season][game] =    dict()
+#                           output[season][game]["game_date"]
+#                           output[season][game]["game_hour"]
+#                           output[season][game]["host"]
+#                           output[season][game]["visitor"]
+#                           output[season][game]["host goal"]
+#                           output[season][game]["visitor goal"]
+#                           output[season][game]["referee"]
+#                           output[season][game]["stadium"]
+#                           output[season][game]["spectators"]
+#                           output[season][game]["host goal_data"]
+#                           output[season][game]["visitor goal_data"]
+#                           output[season][game]["host yellow_card_data"]
+#                           output[season][game]["visitor yellow_card_data"]
+#                           output[season][game]["host red_card_data"]
+#                           output[season][game]["visitor red_card_data"]
+#                           output[season][game]["host starting_team"]
+#                           output[season][game]["visitor starting_team"]
+#                           output[season][game]["host substitution"]
+#                           output[season][game]["visitor substitution"]
+#                           output[season][game]["host manager"]
+#                           output[season][game]["visitor manager"]
 
-def get_data():
+########################################################################################################################
+########################################################################################################################
+def sporza(algorithm,number_of_seasons=1):
+    if algorithm == "spi" or algorithm == "elo":
+        output = sporza_small()
+    else:
+        output = sporza_big(number_of_seasons)
+    return output
+
+# sporza_big gets ALL data from sporza website
+def sporza_big(number_of_seasons):
+    # Time algorithm
+    import time
+
+    # Scraping tools
+    from bs4 import BeautifulSoup
+    import urllib.request
+
+    # Open Main Website
+    start_page = BeautifulSoup(urllib.request.urlopen('http://sporza.be/cm/sporza/matchcenter/mc_voetbal/jupilerleague_1415'))
+
+    # Seasons
+    seasons = start_page.find_all("option")
+
+    # All output will be stored in this list
+    output = list()
+
+    # For season i
+    for i in range(number_of_seasons):
+        # Only for 9 seasons (since 2006/2007) is goal minute data available//otherwise len(seasons) to get data from all seasons (no goal minutes)
+        sim_start = time.time()
+
+        # Append list for season i
+        output.append(list())
+
+        # Open Season i Website
+        season_page = BeautifulSoup(urllib.request.urlopen('http://sporza.be' + seasons[i]['value']))
+
+        # Games in Season i
+        games = season_page.find_all("a", class_=["finished"])
+
+        # For game j
+        for j in range(0,1): # range(len(games))
+            # Append list for game j in season i
+            output[i].append(list())
+
+            # Save all categories in dict
+            output[i][j] = dict()
+
+            # Open Game j Website
+            game_page = BeautifulSoup(urllib.request.urlopen('http://sporza.be' + games[j]['href']))
+
+            # Get data from game
+            # Game Date
+            output[i][j]["game_date"] = game_page.find(id="metadata").get_text().replace('\n','').split(' ')[0]
+
+            # Game hour
+            output[i][j]["game_hour"] = game_page.find(id="metadata").get_text().replace('\n','').split(' ')[1]
+
+            # Host
+            output[i][j]["host"] = game_page.find_all("dt")[0].get_text().replace('\n','')
+
+            # Visitor
+            output[i][j]["visitor"] = game_page.find_all("dt")[1].get_text().replace('\n','')
+
+            # Host goals
+            output[i][j]["host goal"] = game_page.find_all("dd",class_=["score"])[0].get_text().replace('\n','')
+
+            # Visitor goals
+            output[i][j]["visitor goal"] = game_page.find_all("dd",class_=["score"])[1].get_text().replace('\n','')
+
+            if len(game_page.find_all(class_="GENERIC")) is not 0: # Forfait or Lack of data check
+                # Referee
+                output[i][j]["referee"] = game_page.find_all("ul",class_=["lineupmetadata"])[0].get_text().split('\n')[1].replace('scheidsrechter: ','')
+
+                # Stadium
+                output[i][j]["stadium"] = game_page.find_all("ul",class_=["lineupmetadata"])[0].get_text().split('\n')[2].replace('stadion: ','')
+
+                # Spectators
+                output[i][j]["spectators"] = game_page.find_all("ul",class_=["lineupmetadata"])[0].get_text().split('\n')[4].replace('toeschouwers: ','')
+
+                # Goal Data
+                output[i][j]["host goal_data"] = sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],
+                                                           game_page.find_all("ol",class_=["eventsethalftime"])[0],
+                                                           game_page.find_all("ol",class_=["eventset2"])[0],
+                                                           "host goal")
+                output[i][j]["visitor goal_data"] = sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],
+                                                           game_page.find_all("ol",class_=["eventsethalftime"])[0],
+                                                           game_page.find_all("ol",class_=["eventset2"])[0],
+                                                           "visitor goal")
+
+                # Yellow Cards
+                output[i][j]["host yellow_card_data"] = sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],
+                                                           game_page.find_all("ol",class_=["eventsethalftime"])[0],
+                                                           game_page.find_all("ol",class_=["eventset2"])[0],
+                                                           "host yellow_card")
+                output[i][j]["visitor yellow_card_data"] = sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],
+                                                           game_page.find_all("ol",class_=["eventsethalftime"])[0],
+                                                           game_page.find_all("ol",class_=["eventset2"])[0],
+                                                           "visitor yellow_card")
+
+                # Red Cards
+                output[i][j]["host red_card_data"] = sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],
+                                                           game_page.find_all("ol",class_=["eventsethalftime"])[0],
+                                                           game_page.find_all("ol",class_=["eventset2"])[0],
+                                                           "host red_card")
+
+                output[i][j]["visitor red_card_data"] = sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],
+                                                           game_page.find_all("ol",class_=["eventsethalftime"])[0],
+                                                           game_page.find_all("ol",class_=["eventset2"])[0],
+                                                           "visitor red_card")
+
+                # Starting Team
+                home_starting_team_dummy = game_page.find_all(class_="GENERIC")[1].get_text().split('\n')[3].split(', ')
+                home_starting_team_dummy[-1] = home_starting_team_dummy[-1][0:-1]
+                output[i][j]["host starting_team"] = home_starting_team_dummy
+
+                away_starting_team_dummy = game_page.find_all(class_="GENERIC")[0].get_text().split('\n')[3].split(', ')
+                away_starting_team_dummy[-1] = away_starting_team_dummy[-1][0:-1]
+                output[i][j]["visitor starting_team"] = away_starting_team_dummy
+
+                # Substitutions
+                output[i][j]["host substitution"] = sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],
+                                                           game_page.find_all("ol",class_=["eventsethalftime"])[0],
+                                                           game_page.find_all("ol",class_=["eventset2"])[0],
+                                                           "host inout")
+                output[i][j]["visitor substitution"] = sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],
+                                                           game_page.find_all("ol",class_=["eventsethalftime"])[0],
+                                                           game_page.find_all("ol",class_=["eventset2"])[0],
+                                                           "visitor inout")
+
+                # Managers
+                output[i][j]["host manager"] = game_page.find(class_=["coach"]).get_text().replace('\n\xa0\n\n','').split('\n')[0]
+                output[i][j]["visitor manager"] = game_page.find(class_=["coach"]).get_text().replace('\n\xa0\n\n','').split('\n')[1]
+            else:
+                # Just add empty string
+                output[i][j]["referee"] = ''
+                output[i][j]["stadium"] = ''
+                output[i][j]["spectators"] = ''
+                output[i][j]["host goal_data"] = ''
+                output[i][j]["visitor goal_data"] = ''
+                output[i][j]["host yellow_card_data"] = ''
+                output[i][j]["visitor yellow_card_data"] = ''
+                output[i][j]["host red_card_data"] = ''
+                output[i][j]["visitor red_card_data"] = ''
+                output[i][j]["host starting_team"] = ''
+                output[i][j]["visitor starting_team"] = ''
+                output[i][j]["host substitution"] = ''
+                output[i][j]["visitor substitution"] = ''
+                output[i][j]["host manager"] = ''
+                output[i][j]["visitor manager"] = ''
+
+        sim_end = time.time()
+        print('Season scraped in', sim_end - sim_start, 'seconds')
+    return output
+
+# sporza_small gets only results, and only for one season
+def sporza_small():
     from bs4 import BeautifulSoup
     import urllib.request
     import numpy as np
@@ -117,3 +295,40 @@ def get_data():
 
     # What does module return?
     return list([teams, game_data])
+
+# helper function for sporza_big
+def sporza_scrape_function(first_half,halftime,second_half,info):
+    # Take into account first and second yellow
+    if info == "host yellow_card" or info == "visitor yellow_card":
+        dummy_data = second_half.find_all(class_=info + "1") \
+                     + second_half.find_all(class_=info + "2") \
+                     + halftime.find_all(class_=info + "1") \
+                     + halftime.find_all(class_=info + "2") \
+                     + first_half.find_all(class_=info + "1") \
+                     + first_half.find_all(class_=info + "2")
+    else:
+        # Take into account own goals
+        if info == "host goal" or info == "visitor goal":
+            dummy_data = second_half.find_all(class_=info.replace(" goal"," own_goal")) \
+                         +second_half.find_all(class_=info.replace(" goal"," penalty_scored")) \
+                         + second_half.find_all(class_=info) \
+                         + halftime.find_all(class_=info.replace(" goal"," own_goal")) \
+                         + halftime.find_all(class_=info.replace(" goal"," penalty_scored")) \
+                         + halftime.find_all(class_=info) \
+                         + first_half.find_all(class_=info.replace(" goal"," own_goal")) \
+                         + first_half.find_all(class_=info.replace(" goal"," penalty_scored")) \
+                         + first_half.find_all(class_=info)
+        else:
+            dummy_data = second_half.find_all(class_=info) \
+                         + halftime.find_all(class_=info) \
+                         + first_half.find_all(class_=info)
+
+
+    dummy_data_string = ''
+    for k in range(len(dummy_data)):
+        if k == 0:
+            dummy_data_string = dummy_data[k]['title']
+        else:
+            dummy_data_string = dummy_data_string + '//' + dummy_data[k]['title']
+    dummy_data_string = dummy_data_string.replace('<br>','//') # For substitutions in same minute
+    return dummy_data_string

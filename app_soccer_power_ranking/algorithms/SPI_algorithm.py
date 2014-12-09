@@ -41,11 +41,10 @@ __project__ = 'SPI_JupilerProLeague'
 ########################################################################################################################
 def spi():
     import numpy as np
-    from app_soccer_power_ranking.algorithms.sporza import get_data
-    # import sporza
+    import app_soccer_power_ranking.algorithms.sporza as sp
 
     # Import Scraped Data
-    data = get_data()
+    data = sp.sporza("spi")
     # Returns a list of 2 items
     # [0]:  Team names of all teams in Jupiler Pro League
     # [1]:  Array of size (total games x 5)

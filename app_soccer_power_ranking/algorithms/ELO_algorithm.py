@@ -39,10 +39,10 @@ __project__ = 'SPI_JupilerProLeague'
 def elo():
     import numpy as np
     import scipy.stats # For Poisson Distribution, numpy doesn't have it
-    from app_soccer_power_ranking.algorithms.sporza import get_data
+    import app_soccer_power_ranking.algorithms.sporza as sp
 
     # Import Scraped Data
-    data = get_data()
+    data = sp.sporza("elo")
     # [0]:  Team names of all teams in Jupiler Pro League
     # [1]:  Array of size (total games x 4)
     #       [1][:,0]: Home Team (As a number, alphabetically as in [0]
