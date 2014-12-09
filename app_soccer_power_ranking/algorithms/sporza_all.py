@@ -75,14 +75,24 @@ def sporza():
             # 2. Game hour
             output[i][j].append(game_page.find(id="metadata").get_text().replace('\n','').split(' ')[1])
 
-            # 3. Referee
-            output[i][j].append(game_page.find_all("ul",class_=["lineupmetadata"])[0].get_text().split('\n')[1].replace('scheidsrechter: ',''))
+            if len(game_page.find_all(class_="GENERIC")) is not 0: # Forfait or Lack of data check
+                # 3. Referee
+                output[i][j].append(game_page.find_all("ul",class_=["lineupmetadata"])[0].get_text().split('\n')[1].replace('scheidsrechter: ',''))
 
-            # 4. Stadium
-            output[i][j].append(game_page.find_all("ul",class_=["lineupmetadata"])[0].get_text().split('\n')[2].replace('stadion: ',''))
+                # 4. Stadium
+                output[i][j].append(game_page.find_all("ul",class_=["lineupmetadata"])[0].get_text().split('\n')[2].replace('stadion: ',''))
 
-            # 5. Spectators
-            output[i][j].append(game_page.find_all("ul",class_=["lineupmetadata"])[0].get_text().split('\n')[4].replace('toeschouwers: ',''))
+                # 5. Spectators
+                output[i][j].append(game_page.find_all("ul",class_=["lineupmetadata"])[0].get_text().split('\n')[4].replace('toeschouwers: ',''))
+            else:
+                # 3. Referee
+                output[i][j].append('')
+
+                # 4. Stadium
+                output[i][j].append('')
+
+                # 5. Spectators
+                output[i][j].append('')
 
             # 6. Home Team
             output[i][j].append(game_page.find_all("dt")[0].get_text().replace('\n',''))
@@ -96,53 +106,95 @@ def sporza():
             # 9. Away goals
             output[i][j].append(game_page.find_all("dd",class_=["score"])[1].get_text().replace('\n',''))
 
-            # 10. Home goal scorers + minute (eventset1 == first half; eventset2 == second half)
-            output[i][j].append(sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],game_page.find_all("ol",class_=["eventset2"])[0],"host goal"))
+            if len(game_page.find_all(class_="GENERIC")) is not 0: # Forfait or Lack of data check
 
-            # 11. Away goal scorers + minute (eventset1 == first half; eventset2 == second half)
-            output[i][j].append(sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],game_page.find_all("ol",class_=["eventset2"])[0],"visitor goal"))
+                # 10. Home goal scorers + minute (eventset1 == first half; eventset2 == second half)
+                output[i][j].append(sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],
+                                                           game_page.find_all("ol",class_=["eventsethalftime"])[0],
+                                                           game_page.find_all("ol",class_=["eventset2"])[0],
+                                                           "host goal"))
 
-            # 12. Home yellow cards + minute
-            output[i][j].append(sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],game_page.find_all("ol",class_=["eventset2"])[0],"host yellow_card"))
+                # 11. Away goal scorers + minute (eventset1 == first half; eventset2 == second half)
+                output[i][j].append(sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],
+                                                           game_page.find_all("ol",class_=["eventsethalftime"])[0],
+                                                           game_page.find_all("ol",class_=["eventset2"])[0],
+                                                           "visitor goal"))
+                # 12. Home yellow cards + minute
+                output[i][j].append(sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],
+                                                           game_page.find_all("ol",class_=["eventsethalftime"])[0],
+                                                           game_page.find_all("ol",class_=["eventset2"])[0],
+                                                           "host yellow_card"))
+                # 13. Away yellow cards + minute
+                output[i][j].append(sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],
+                                                           game_page.find_all("ol",class_=["eventsethalftime"])[0],
+                                                           game_page.find_all("ol",class_=["eventset2"])[0],
+                                                           "visitor yellow_card"))
+                # 14. Home red cards + minute
+                output[i][j].append(sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],
+                                                           game_page.find_all("ol",class_=["eventsethalftime"])[0],
+                                                           game_page.find_all("ol",class_=["eventset2"])[0],
+                                                           "host red_card"))
+                # 15. Away red cards + minute
+                output[i][j].append(sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],
+                                                           game_page.find_all("ol",class_=["eventsethalftime"])[0],
+                                                           game_page.find_all("ol",class_=["eventset2"])[0],
+                                                           "visitor red_card"))
+                # 16. Home starting team
+                home_starting_team_dummy = game_page.find_all(class_="GENERIC")[0].get_text().split('\n')[3].split(', ')
+                home_starting_team_dummy[-1] = home_starting_team_dummy[-1][0:-1]
+                output[i][j].append(home_starting_team_dummy)
 
-            # 13. Away yellow cards + minute
-            output[i][j].append(sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],game_page.find_all("ol",class_=["eventset2"])[0],"visitor yellow_card"))
+                # 17. Away starting team
+                away_starting_team_dummy = game_page.find_all(class_="GENERIC")[1].get_text().split('\n')[3].split(', ')
+                away_starting_team_dummy[-1] = away_starting_team_dummy[-1][0:-1]
+                output[i][j].append(away_starting_team_dummy)
 
-            # 14. Home red cards + minute
-            output[i][j].append(sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],game_page.find_all("ol",class_=["eventset2"])[0],"host red_card"))
+                # 18. Home substitutions (players in/out + minute)
+                output[i][j].append(sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],
+                                                           game_page.find_all("ol",class_=["eventsethalftime"])[0],
+                                                           game_page.find_all("ol",class_=["eventset2"])[0],
+                                                           "host inout"))
 
-            # 15. Away red cards + minute
-            output[i][j].append(sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],game_page.find_all("ol",class_=["eventset2"])[0],"visitor red_card"))
-
-            # 16. Home starting team
-            home_starting_team_dummy = game_page.find_all(class_="GENERIC")[0].get_text().split('\n')[3].split(', ')
-            home_starting_team_dummy[-1] = home_starting_team_dummy[-1][0:-1]
-            output[i][j].append(home_starting_team_dummy)
-
-            # 17. Away starting team
-            away_starting_team_dummy = game_page.find_all(class_="GENERIC")[1].get_text().split('\n')[3].split(', ')
-            away_starting_team_dummy[-1] = away_starting_team_dummy[-1][0:-1]
-            output[i][j].append(away_starting_team_dummy)
-
-            # 18. Home substitutions (players in/out + minute)
-            output[i][j].append(sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],game_page.find_all("ol",class_=["eventset2"])[0],"host inout"))
-
-            # 19. Away substitutions (players in/out + minute)
-            output[i][j].append(sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],game_page.find_all("ol",class_=["eventset2"])[0],"visitor inout"))
+                # 19. Away substitutions (players in/out + minute)
+                output[i][j].append(sporza_scrape_function(game_page.find_all("ol",class_=["eventset1"])[0],
+                                                           game_page.find_all("ol",class_=["eventsethalftime"])[0],
+                                                           game_page.find_all("ol",class_=["eventset2"])[0],
+                                                           "visitor inout"))
+            else:
+                # Just add empty string
+                for i in range(10):
+                    output[i][j].append('')
 
         sim_end = time.time()
         print('Season scraped in', sim_end - sim_start, 'seconds')
     return output
 
-def sporza_scrape_function(list1,list2,info):
+def sporza_scrape_function(first_half,halftime,second_half,info):
+    # Take into account first and second yellow
     if info == "host yellow_card" or info == "visitor yellow_card":
-        dummy_data = list2.find_all(class_=info) \
-                          + list2.find_all(class_=info) \
-                          + list1.find_all(class_=info) \
-                          + list1.find_all(class_=info)
+        dummy_data = second_half.find_all(class_=info + "1") \
+                     + second_half.find_all(class_=info + "2") \
+                     + halftime.find_all(class_=info + "1") \
+                     + halftime.find_all(class_=info + "2") \
+                     + first_half.find_all(class_=info + "1") \
+                     + first_half.find_all(class_=info + "2")
     else:
-        dummy_data = list2.find_all(class_=info) \
-                          + list1.find_all(class_=info)
+        # Take into account own goals
+        if info == "host goal" or info == "visitor goal":
+            dummy_data = second_half.find_all(class_=info.replace(" goal"," own_goal")) \
+                         +second_half.find_all(class_=info.replace(" goal"," penalty_scored")) \
+                         + second_half.find_all(class_=info) \
+                         + halftime.find_all(class_=info.replace(" goal"," own_goal")) \
+                         + halftime.find_all(class_=info.replace(" goal"," penalty_scored")) \
+                         + halftime.find_all(class_=info) \
+                         + first_half.find_all(class_=info.replace(" goal"," own_goal")) \
+                         + first_half.find_all(class_=info.replace(" goal"," penalty_scored")) \
+                         + first_half.find_all(class_=info)
+        else:
+            dummy_data = second_half.find_all(class_=info) \
+                         + halftime.find_all(class_=info) \
+                         + first_half.find_all(class_=info)
+
 
     dummy_data_string = ''
     for k in range(len(dummy_data)):
