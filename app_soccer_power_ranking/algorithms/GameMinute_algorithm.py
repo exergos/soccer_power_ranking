@@ -7,7 +7,7 @@ __author__ = 'Exergos'
 # for example: What is the chance the host wins if host is behind 2 goals at the 30 minute mark?
 # output['-2']['1']['30']
 
-def GameMinute(data, goal_difference = 10):
+def GameMinute(data, goal_difference = 16):
     # Parameters:
     # data = output from sporza() function (NOT "spi" or "elo")
         # If sporza_big(number_of_seasons) is called:
