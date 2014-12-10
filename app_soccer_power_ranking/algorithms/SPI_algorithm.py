@@ -19,33 +19,23 @@ __project__ = 'SPI_JupilerProLeague'
 # What does it return?
 ######################
 
-# Returns a list of 2 items
+# A list of 2 things:
 # [0]:  List of 2 things
-# [0][1]: Team names of all teams in Jupiler Pro League
-#       [0][2]: Array of size (number of teams x 3)
-#               [0][2][:,0]: SPI
-#               [0][2][:,1]: Off Rating
-#               [0][2][:,2]: Def Rating
+#       [0][0]: Team names of all teams in Jupiler Pro League
+#       [0][1]: Array of size (number of teams x 3)
+#               [0][1][:,0]: SPI
+#               [0][1][:,1]: Off Rating
+#               [0][1][:,2]: Def Rating
 
-# [1]:  Array of size ((games played + games not played) x 8)
-#       [1][:,0]: Home Team (As a number, alphabetically as in [0]
-#       [1][:,1]: Away Team (As a number, alphabetically as in [0]
-#       [1][:,2]: Home Team Goals
-#       [1][:,3]: Away Team Goals
-#       [1][:,4]: Game already played? (1 = yes, 0 = no)
-#       [1][:,5]: Probability of Home Win
-#       [1][:,6]: Probability of Tie
-#       [1][:,7]: Probability of Away Win
+# [1]:  A size (number_of_teams x number_of_teams) matrix with the percentage chance of every team to end up in every
+#       possible league position
 
 ########################################################################################################################
 ########################################################################################################################
-def spi():
+def spi(data, simulations = 10000):
     import numpy as np
-    import app_soccer_power_ranking.algorithms.sporza as sp
 
-    # Import Scraped Data
-    data = sp.sporza("spi")
-    # Returns a list of 2 items
+    # data a list of 2 lists
     # [0]:  Team names of all teams in Jupiler Pro League
     # [1]:  Array of size (total games x 5)
     #       [1][:,0]: Home Team (As a number, alphabetically as in [0]
@@ -232,4 +222,32 @@ def spi():
         SPI[i, 0] = SPI[i, 0] / (2 * total_games / number_of_teams)
 
     print('SPI Algorithm finished')
-    return list([[data[0], np.concatenate((SPI, off_rating[:, iter], def_rating[:, iter]), axis=1)], data[1]])
+
+
+    output = list([[data[0], np.concatenate((SPI, off_rating[:, iter], def_rating[:, iter]), axis=1)], data[1]])
+
+    # Output is a list of 2 items
+    # [0]:  List of 2 things
+    # [0][1]: Team names of all teams in Jupiler Pro League
+    #       [0][2]: Array of size (number of teams x 3)
+    #               [0][2][:,0]: SPI
+    #               [0][2][:,1]: Off Rating
+    #               [0][2][:,2]: Def Rating
+
+    # [1]:  Array of size ((games played + games not played) x 8)
+    #       [1][:,0]: Home Team (As a number, alphabetically as in [0]
+    #       [1][:,1]: Away Team (As a number, alphabetically as in [0]
+    #       [1][:,2]: Home Team Goals
+    #       [1][:,3]: Away Team Goals
+    #       [1][:,4]: Game already played? (1 = yes, 0 = no)
+    #       [1][:,5]: Probability of Home Win
+    #       [1][:,6]: Probability of Tie
+    #       [1][:,7]: Probability of Away Win
+
+    # This can in the future be used for soccer power ranking app
+    # For now only output league ranking distribution data, based on montecarlo simulation:
+
+    from app_soccer_power_ranking.algorithms.montecarlo import montecarlo
+    output = montecarlo(output,simulations)
+
+    return output

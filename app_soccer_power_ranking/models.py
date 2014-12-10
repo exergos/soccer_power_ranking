@@ -40,8 +40,55 @@ class game_situations(models.Model):
     # Field 3: End Result
     result = models.DecimalField(max_digits= 65, decimal_places= 0)
     # Field 4: Home Win Chance
-    home_win_chance = models.DecimalField(max_digits= 65, decimal_places= 30)
-    # Field 5: Tie Chance
-    tie_chance = models.DecimalField(max_digits= 65, decimal_places= 30)
-    # Field 6: Away Win Chance
-    away_win_chance = models.DecimalField(max_digits= 65, decimal_places= 30)
+    chance = models.DecimalField(max_digits= 65, decimal_places= 30)
+
+class game_data(models.Model):
+    # If sporza_big(number_of_seasons) is called:
+    # output[season][game] =    dict()
+    #                           output[season][game]["game_date"]
+    #                           output[season][game]["game_hour"]
+    #                           output[season][game]["host"]
+    #                           output[season][game]["visitor"]
+    #                           output[season][game]["host_goal"]
+    #                           output[season][game]["visitor_goal"]
+    #                           output[season][game]["referee"]
+    #                           output[season][game]["stadium"]
+    #                           output[season][game]["spectators"]
+    #                           output[season][game]["host_goal_data"]
+    #                           output[season][game]["visitor_goal_data"]
+    #                           output[season][game]["host_yellow_card_data"]
+    #                           output[season][game]["visitor_yellow_card_data"]
+    #                           output[season][game]["host_red_card_data"]
+    #                           output[season][game]["visitor_red_card_data"]
+    #                           output[season][game]["host_starting_team"]
+    #                           output[season][game]["visitor_starting_team"]
+    #                           output[season][game]["host_substitution"]
+    #                           output[season][game]["visitor_substitution"]
+    #                           output[season][game]["host_manager"]
+    #                           output[season][game]["visitor_manager"]
+    #                           output[season][game]["minute_x"] with x from 1 tot 90
+    game_date = models.CharField(max_length=30,default='')
+    game_hour = models.CharField(max_length=30,default = '')
+    host = models.CharField(max_length=30,default = '')
+    visitor = models.CharField(max_length=30,default = '')
+    host_goal = models.CharField(max_length=30,default = '')
+    visitor_goal = models.CharField(max_length=30,default = '')
+    referee = models.CharField(max_length=30,default = '')
+    stadium = models.CharField(max_length=30,default = '')
+    spectators = models.CharField(max_length=30,default = '')
+    host_goal_data = models.CharField(max_length=30,default = '')
+    visitor_goal_data = models.CharField(max_length=30,default = '')
+    host_yellow_card_data = models.CharField(max_length=30,default = '')
+    visitor_yellow_card_data = models.CharField(max_length=30,default = '')
+    host_red_card_data = models.CharField(max_length=30,default = '')
+    visitor_red_card_data = models.CharField(max_length=30,default = '')
+    host_starting_team = models.CharField(max_length=30,default = '')
+    visitor_starting_team = models.CharField(max_length=30,default = '')
+    host_substitution = models.CharField(max_length=30,default = '')
+    visitor_substitution = models.CharField(max_length=30,default = '')
+    host_manager = models.CharField(max_length=30,default = '')
+    visitor_manager = models.CharField(max_length=30,default = '')
+
+# Other fields: All possible minutes
+for i in range(90):
+    game_data.add_to_class('minute_%s' % (i+1), models.IntegerField(default=0))
