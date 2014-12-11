@@ -33,6 +33,9 @@ for i in range(16):
     elo_data.add_to_class('finish_%s' % (i+1), models.DecimalField(max_digits= 65, decimal_places= 30))
 
 class game_situations(models.Model):
+    # To loop through field names and field values in template
+    def get_fields(self):
+        return [(field.name, field.value_to_string(self)) for field in game_situations._meta.fields]
     # Field 1: Minute
     minute = models.DecimalField(max_digits= 65, decimal_places= 0)
     # Field 2: Score difference (Delta)
@@ -43,6 +46,10 @@ class game_situations(models.Model):
     chance = models.DecimalField(max_digits= 65, decimal_places= 30)
 
 class game_data(models.Model):
+    # To loop through field names and field values in template
+    def get_fields(self):
+        return [(field.name, field.value_to_string(self)) for field in game_data._meta.fields]
+
     # If sporza_big(number_of_seasons) is called:
     # output[season][game] =    dict()
     #                           output[season][game]["game_date"]

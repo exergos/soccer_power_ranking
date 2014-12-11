@@ -6,6 +6,8 @@ from django.shortcuts import render
 # Import models to use in website (database - site connection)
 from app_soccer_power_ranking.models import spi_data
 from app_soccer_power_ranking.models import elo_data
+from app_soccer_power_ranking.models import game_data
+from app_soccer_power_ranking.models import game_situations
 
 # To make list of lists that are not copies of eachother
 from itertools import repeat
@@ -21,7 +23,7 @@ class DecimalEncoder(json.JSONEncoder):
             return float(o)
         return super(DecimalEncoder, self).default(o)
 
-def index(request):
+def ranking(request):
 
     # Construct a dictionary to pass to the template engine as its context.
     # Note the key boldmessage is the same as {{ boldmessage }} in the template!
@@ -52,7 +54,7 @@ def index(request):
                 if team == 0:
                     elo_table_headers.append(name)
     # Second get all data for chart in a list of lists (16+1,2)
-    # Put data in right format to be used by Google Chart in index.html
+    # Put data in right format to be used by Google Chart in ranking.html
     # i.e.: a list of lists with headers and data (finish position and percentage chance)
     spi_chart = [[[] for i in repeat(None, 17)] for j in repeat(None, 16)]
 
@@ -87,18 +89,47 @@ def index(request):
     for team in range(len(elo_chart)):
         elo_chart[team] = json.dumps(elo_chart[team], cls=DecimalEncoder)
 
-    # # Create links to images (team logos)
-    # team_logo_links = list()
-    # for i in range(len(spi_table_values)):
-    #     # team_logo_links.append("{% static \"static/images/Team Logos/" + spi_table_values[i][0] + ".png\" %}")
-    #     team_logo_links.append("images/Team Logos/" + spi_table_values[i][0] + ".png")
-
-
-
     context_dict = {'spi_table_headers': spi_table_headers, 'spi_table_values': spi_table_values, 'spi_chart': spi_chart,
                     'elo_table_headers': elo_table_headers, 'elo_table_values': elo_table_values, 'elo_chart': elo_chart}
 
 
-    return render(request, 'app_soccer_power_ranking/index.html', context_dict)
+    return render(request, 'app_soccer_power_ranking/ranking.html', context_dict)
 
 
+def chart(request):
+    # Select Game
+    game = game_data.objects.filter(id="2500")
+    # if int(game.values("host_goal")[0].get("host_goal")) > int(game.values("visitor_goal")[0].get("visitor_goal")):
+    #     end_result = 1
+    # else:
+    #     if int(game.values("host_goal")[0].get("host_goal")) == int(game.values("visitor_goal")[0].get("visitor_goal")):
+    #         end_result = 0
+    #     else:
+    #         end_result = -1
+
+    # Game Chance chart
+    # game_chart
+    minutes = 90
+    game_chart = [[] for i in repeat(None,minutes)]
+    game_chart.insert(0,["Minute","Host","Tie","Visitor"])
+
+    for i in range(minutes):
+        delta_par = game.values("minute_" + str(int(i+1)))[0].get("minute_" + str(int(i+1)))
+        minute_par = i+1
+        game_chart[i+1].append(str(minute_par))
+
+        # Create areachart
+        host_win = game_situations.objects.filter(minute=str(minute_par),delta=delta_par,result=str(1)).values("chance")[0].get("chance")
+        tie = host_win + game_situations.objects.filter(minute=str(minute_par),delta=delta_par,result=str(0)).values("chance")[0].get("chance")
+        visitor_win = 1
+        game_chart[i+1].append(host_win)# Select Game
+        game_chart[i+1].append(tie)# Select Game
+        game_chart[i+1].append(visitor_win)# Select Game
+
+    # Django to Javascript gives problems
+    # Therefore, convert using jsonEncoder!
+    # Do this for every team separate, otherwise problems!
+    game_chart = json.dumps(game_chart, cls=DecimalEncoder)
+    context_dict = {'game_chart': game_chart}
+
+    return render(request, 'app_soccer_power_ranking/chart.html', context_dict)
