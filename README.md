@@ -1,4 +1,4 @@
-soccer_power_ranking
+Soccer Power Ranking
 ====================
 
 Algorithm to produce a Soccer Power Ranking (for now only Belgium).
