@@ -35,11 +35,13 @@ __project__ = 'SPI_JupilerProLeague'
 
 ########################################################################################################################
 ########################################################################################################################
-def elo(data, simulations = 10000):
+def elo(input_data, simulations = 10000):
     import numpy as np
     import scipy.stats # For Poisson Distribution, numpy doesn't have it
+    from app_soccer_power_ranking.algorithms.game_to_team_data import game_to_team
+    input_data = game_to_team(input_data)
 
-    # data is a list of 2 lists:
+    # input_data is a list of 2 lists:
     # [0]:  Team names of all teams in Jupiler Pro League
     # [1]:  Array of size (total games x 4)
     #       [1][:,0]: Home Team (As a number, alphabetically as in [0]
@@ -49,11 +51,11 @@ def elo(data, simulations = 10000):
     #       [1][:,4]: Game already played (1 = yes, 0 = no)
 
     # Define some parameters that will help with reading the code
-    number_of_teams = len(data[0])
-    total_games = len(data[1])
+    number_of_teams = len(input_data[0])
+    total_games = len(input_data[1])
     games_played = 0
     for i in range(total_games):
-        if data[1][i,4] == 1:
+        if input_data[1][i,4] == 1:
             games_played = games_played + 1
 
     # Calculate ELO using ELO Formula
@@ -69,42 +71,42 @@ def elo(data, simulations = 10000):
 
     for i in range(games_played):
         # Calculate W_home, W_away and G parameter for game
-        if data[1][i,2] > data[1][i,3]: # Home Win
+        if input_data[1][i,2] > input_data[1][i,3]: # Home Win
             W_home = 1
             W_away = 0
-        if data[1][i,2] == data[1][i,3]: # Draw
+        if input_data[1][i,2] == input_data[1][i,3]: # Draw
             W_home = 0.5
             W_away = 0.5
-        if data[1][i,2] < data[1][i,3]: # Away Win
+        if input_data[1][i,2] < input_data[1][i,3]: # Away Win
             W_home = 0
             W_away = 1
 
         # G
-        if data[1][i,2] == data[1][i,3] or abs(data[1][i,2] - data[1][i,3]) == 1: # Draw or 1 goal difference
+        if input_data[1][i,2] == input_data[1][i,3] or abs(input_data[1][i,2] - input_data[1][i,3]) == 1: # Draw or 1 goal difference
             G = 1
         else:
-            if abs(data[1][i,2] - data[1][i,3]) == 2: # 2 goals difference
+            if abs(input_data[1][i,2] - input_data[1][i,3]) == 2: # 2 goals difference
                 G = 3/2
             else: # 3 or more goals difference
-                G = (11 + abs(data[1][i,2] - data[1][i,3]))/8
+                G = (11 + abs(input_data[1][i,2] - input_data[1][i,3]))/8
 
         # Calculate ELO rating AFTER game
         if i == 0: # First game of the season
             # Home Team new ELO rating after game
             W_home_e = 1/(10**(-home_field_advantage/400)+1)
-            elo_rating_after_game[i,data[1][i,0]] = elo_start + K*G*(W_home-W_home_e)
+            elo_rating_after_game[i,input_data[1][i,0]] = elo_start + K*G*(W_home-W_home_e)
 
             # Away Team new ELO rating after game
             W_away_e = 1/(10**(home_field_advantage/400)+1)
-            elo_rating_after_game[i,data[1][i,1]] = elo_start + K*G*(W_away-W_away_e)
+            elo_rating_after_game[i,input_data[1][i,1]] = elo_start + K*G*(W_away-W_away_e)
         else:
             # Home Team new ELO rating after game
-            W_home_e = 1/(10**(-(elo_rating_after_game[i-1,data[1][i,0]]+home_field_advantage-elo_rating_after_game[i-1,data[1][i,1]])/400)+1)
-            elo_rating_after_game[i,data[1][i,0]] = elo_rating_after_game[i-1,data[1][i,0]] + K*G*(W_home-W_home_e)
+            W_home_e = 1/(10**(-(elo_rating_after_game[i-1,input_data[1][i,0]]+home_field_advantage-elo_rating_after_game[i-1,input_data[1][i,1]])/400)+1)
+            elo_rating_after_game[i,input_data[1][i,0]] = elo_rating_after_game[i-1,input_data[1][i,0]] + K*G*(W_home-W_home_e)
 
             # Away Team new ELO rating after game
-            W_away_e = 1/(10**(-(elo_rating_after_game[i-1,data[1][i,1]]-home_field_advantage-elo_rating_after_game[i-1,data[1][i,0]])/400)+1)
-            elo_rating_after_game[i,data[1][i,1]] = elo_rating_after_game[i-1,data[1][i,1]] + K*G*(W_away-W_away_e)
+            W_away_e = 1/(10**(-(elo_rating_after_game[i-1,input_data[1][i,1]]-home_field_advantage-elo_rating_after_game[i-1,input_data[1][i,0]])/400)+1)
+            elo_rating_after_game[i,input_data[1][i,1]] = elo_rating_after_game[i-1,input_data[1][i,1]] + K*G*(W_away-W_away_e)
 
         # For every team that didn't play, copy old elo into new spot
         for j in range(number_of_teams):
@@ -115,11 +117,11 @@ def elo(data, simulations = 10000):
                     elo_rating_after_game[i,j] = elo_rating_after_game[i-1,j]
 
     # Now calculate Win/Loss/Draw expectancy for all games based on actual ELO (after last played game)
-    # Expand data[1]
-    data[1] = np.c_[data[1], np.zeros((total_games, 3))]  # 3 extra data columns (prob home win, prob tie, prob away win)
+    # Expand input_data[1]
+    input_data[1] = np.c_[input_data[1], np.zeros((total_games, 3))]  # 3 extra input_data columns (prob home win, prob tie, prob away win)
     for i in range(total_games):
         # Home Team new ELO rating after game
-        W_home_e = 1/(10**(-(elo_rating_after_game[games_played-1,data[1][i,0]]+home_field_advantage-elo_rating_after_game[games_played-1,data[1][i,1]])/400)+1)
+        W_home_e = 1/(10**(-(elo_rating_after_game[games_played-1,input_data[1][i,0]]+home_field_advantage-elo_rating_after_game[games_played-1,input_data[1][i,1]])/400)+1)
 
         # First estimate expected goals
         # Goals for Home team
@@ -141,20 +143,20 @@ def elo(data, simulations = 10000):
             for k in range(15):
                 if j > k:
                     # Home Win
-                   data[1][i,5] = data[1][i,5] + scipy.stats.distributions.poisson.pmf(j,home_goals)*scipy.stats.distributions.poisson.pmf(k,away_goals)
+                   input_data[1][i,5] = input_data[1][i,5] + scipy.stats.distributions.poisson.pmf(j,home_goals)*scipy.stats.distributions.poisson.pmf(k,away_goals)
                 if j == k:
                     # Tie
-                   data[1][i,6] = data[1][i,6] + scipy.stats.distributions.poisson.pmf(j,home_goals)*scipy.stats.distributions.poisson.pmf(k,away_goals)
+                   input_data[1][i,6] = input_data[1][i,6] + scipy.stats.distributions.poisson.pmf(j,home_goals)*scipy.stats.distributions.poisson.pmf(k,away_goals)
                 if j < k:
                     # Away Win
-                   data[1][i,7] = data[1][i,7] + scipy.stats.distributions.poisson.pmf(j,home_goals)*scipy.stats.distributions.poisson.pmf(k,away_goals)
+                   input_data[1][i,7] = input_data[1][i,7] + scipy.stats.distributions.poisson.pmf(j,home_goals)*scipy.stats.distributions.poisson.pmf(k,away_goals)
 
         # Make sure probabilities sum up to 1 (otherwise problem for montecarlo simulation)
-        data[1][i,5:8] /= data[1][i,5:8].sum()
+        input_data[1][i,5:8] /= input_data[1][i,5:8].sum()
 
     print('ELO Algorithm finished')
 
-    output = list([[data[0], elo_rating_after_game[-1,:]], data[1]])
+    output = list([[input_data[0], elo_rating_after_game[-1,:]], input_data[1]])
 
     # Output is a list of 2 items
     # [0]:  List of 2 things

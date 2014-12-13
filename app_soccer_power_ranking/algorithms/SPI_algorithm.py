@@ -32,10 +32,12 @@ __project__ = 'SPI_JupilerProLeague'
 
 ########################################################################################################################
 ########################################################################################################################
-def spi(data, simulations = 10000):
+def spi(input_data, simulations = 10000):
     import numpy as np
+    from app_soccer_power_ranking.algorithms.game_to_team_data import game_to_team
+    input_data = game_to_team(input_data)
 
-    # data a list of 2 lists
+    # input_data a list of 2 lists
     # [0]:  Team names of all teams in Jupiler Pro League
     # [1]:  Array of size (total games x 5)
     #       [1][:,0]: Home Team (As a number, alphabetically as in [0]
@@ -45,11 +47,11 @@ def spi(data, simulations = 10000):
     #       [1][:,4]: Game already played (1 = yes, 0 = no)
 
     # Define some parameters that will help with reading the code
-    number_of_teams = len(data[0])
-    total_games = len(data[1])
+    number_of_teams = len(input_data[0])
+    total_games = len(input_data[1])
     games_played = 0
     for i in range(total_games):
-        if data[1][i,4] == 1:
+        if input_data[1][i,4] == 1:
             games_played = games_played + 1
     # games_not_played = total_games - games_played
 
@@ -59,45 +61,45 @@ def spi(data, simulations = 10000):
     goals = np.zeros((number_of_teams, 3))
     for i in range(number_of_teams):
         for j in range(games_played):
-            if data[1][j, 0] == i:  # Home team
-                goals[i, 0] = goals[i, 0] + data[1][j, 2]
-                goals[i, 1] = goals[i, 1] + data[1][j, 3]
+            if input_data[1][j, 0] == i:  # Home team
+                goals[i, 0] = goals[i, 0] + input_data[1][j, 2]
+                goals[i, 1] = goals[i, 1] + input_data[1][j, 3]
                 goals[i, 2] = goals[i, 2] + 1
-            if data[1][j, 1] == i:  # Away team
-                goals[i, 0] = goals[i, 0] + data[1][j, 3]
-                goals[i, 1] = goals[i, 1] + data[1][j, 2]
+            if input_data[1][j, 1] == i:  # Away team
+                goals[i, 0] = goals[i, 0] + input_data[1][j, 3]
+                goals[i, 1] = goals[i, 1] + input_data[1][j, 2]
                 goals[i, 2] = goals[i, 2] + 1
 
     off_rating = np.matrix(np.divide(goals[:, 0], goals[:, 2])).transpose()
     def_rating = np.matrix(np.divide(goals[:, 1], goals[:, 2])).transpose()
     # Calculate starting values (to make sure iterative process is converging)
-    # Initialize data & parameters
-    avg_base = 1.37  # Average number of goals scored per team per game in competition (based on historic data)
+    # Initialize input_data & parameters
+    avg_base = 1.37  # Average number of goals scored per team per game in competition (based on historic input_data)
     # Use lists for ags/aga because exact size is unknown beforehand
     ags = [[] for x in range(number_of_teams)]
     aga = [[] for x in range(number_of_teams)]
 
     for i in range(games_played):  # For every game
         for k in range(number_of_teams):  # Check home and away team
-            if data[1][i, 0] == k:  # Team was home team for this game
+            if input_data[1][i, 0] == k:  # Team was home team for this game
                 home_team = k
-            if data[1][i, 1] == k:  # Team was away team for this game
+            if input_data[1][i, 1] == k:  # Team was away team for this game
                 away_team = k
         # Home team ags & aga calculation
-        ags_dummy = ((data[1][i, 2] - def_rating[away_team, 0]) / max(0.25,
+        ags_dummy = ((input_data[1][i, 2] - def_rating[away_team, 0]) / max(0.25,
                                                                       def_rating[away_team, 0] * 0.424 + 0.548)) * (
                         avg_base * 0.424 + 0.548) + avg_base
-        aga_dummy = ((data[1][i, 3] - off_rating[away_team, 0]) / max(0.25,
+        aga_dummy = ((input_data[1][i, 3] - off_rating[away_team, 0]) / max(0.25,
                                                                       off_rating[away_team, 0] * 0.424 + 0.548)) * (
                         avg_base * 0.424 + 0.548) + avg_base
         ags[home_team].append(ags_dummy)
         aga[home_team].append(aga_dummy)
 
         # Away team ags & aga calculation
-        ags_dummy = ((data[1][i, 3] - def_rating[home_team, 0]) / max(0.25,
+        ags_dummy = ((input_data[1][i, 3] - def_rating[home_team, 0]) / max(0.25,
                                                                       def_rating[home_team, 0] * 0.424 + 0.548)) * (
                         avg_base * 0.424 + 0.548) + avg_base
-        aga_dummy = ((data[1][i, 2] - off_rating[home_team, 0]) / max(0.25,
+        aga_dummy = ((input_data[1][i, 2] - off_rating[home_team, 0]) / max(0.25,
                                                                       off_rating[home_team, 0] * 0.424 + 0.548)) * (
                         avg_base * 0.424 + 0.548) + avg_base
         ags[away_team].append(ags_dummy)
@@ -115,22 +117,22 @@ def spi(data, simulations = 10000):
     iter = 0
     while iter_test[iter] > error and iter < 30:
 
-        # Initialize data & parameters
-        avg_base = 1.37  # Average number of goals scored per team per game in competition (based on historic data)
+        # Initialize input_data & parameters
+        avg_base = 1.37  # Average number of goals scored per team per game in competition (based on historic input_data)
         # Use lists for ags/aga because exact size is unknown beforehand
         ags = [[] for x in range(number_of_teams)]
         aga = [[] for x in range(number_of_teams)]
 
         for i in range(games_played):  # For every game
             for k in range(number_of_teams):  # Check home and away team
-                if data[1][i, 0] == k:  # Team was home team for this game
+                if input_data[1][i, 0] == k:  # Team was home team for this game
                     home_team = k
-                if data[1][i, 1] == k:  # Team was away team for this game
+                if input_data[1][i, 1] == k:  # Team was away team for this game
                     away_team = k
             # Home team ags & aga calculation
-            ags_dummy = ((data[1][i, 2] - def_rating[away_team, iter]) / max(0.25, def_rating[
+            ags_dummy = ((input_data[1][i, 2] - def_rating[away_team, iter]) / max(0.25, def_rating[
                 away_team, iter] * 0.424 + 0.548)) * (avg_base * 0.424 + 0.548) + avg_base
-            aga_dummy = ((data[1][i, 3] - off_rating[away_team, iter]) / max(0.25, off_rating[
+            aga_dummy = ((input_data[1][i, 3] - off_rating[away_team, iter]) / max(0.25, off_rating[
                 away_team, iter] * 0.424 + 0.548)) * (avg_base * 0.424 + 0.548) + avg_base
             ags[home_team].append(ags_dummy)
             aga[home_team].append(aga_dummy)
@@ -138,9 +140,9 @@ def spi(data, simulations = 10000):
             iter_test2[i, iter] = max(0.25, def_rating[away_team, iter] * 0.424 + 0.548)
 
             # Away team ags & aga calculation
-            ags_dummy = ((data[1][i, 3] - def_rating[home_team, iter]) / max(0.25, def_rating[
+            ags_dummy = ((input_data[1][i, 3] - def_rating[home_team, iter]) / max(0.25, def_rating[
                 home_team, iter] * 0.424 + 0.548)) * (avg_base * 0.424 + 0.548) + avg_base
-            aga_dummy = ((data[1][i, 2] - off_rating[home_team, iter]) / max(0.25, off_rating[
+            aga_dummy = ((input_data[1][i, 2] - off_rating[home_team, iter]) / max(0.25, off_rating[
                 home_team, iter] * 0.424 + 0.548)) * (avg_base * 0.424 + 0.548) + avg_base
             ags[away_team].append(ags_dummy)
             aga[away_team].append(aga_dummy)
@@ -174,57 +176,57 @@ def spi(data, simulations = 10000):
     K = 0.905
 
     # Calculate probabilities for all possible matches in Jupiler Pro League
-    # Extend data[1] with extra columns
-    data[1] = np.c_[data[1], np.zeros(
-        (total_games, 3))]  # 3 extra data columns (prob home win, prob tie, prob away win)
+    # Extend input_data[1] with extra columns
+    input_data[1] = np.c_[input_data[1], np.zeros(
+        (total_games, 3))]  # 3 extra input_data columns (prob home win, prob tie, prob away win)
 
-    # # Add game already played data
+    # # Add game already played input_data
     # for i in range(total_games):
-    #     data[1][0:games_played, (data[1].shape[1] - 1)] = 1
+    #     input_data[1][0:games_played, (input_data[1].shape[1] - 1)] = 1
 
     # Calculate probabilities
     for i in range(total_games):
         # Probability for Home Win
-        data[1][i, 5] = H * off_rating[data[1][i, 0].astype(int), iter] * def_rating[
-            data[1][i, 1].astype(int), iter] / (
-                            H * off_rating[data[1][i, 0].astype(int), iter] * def_rating[data[1][i, 1].astype(int), iter] +
-                            off_rating[data[1][i, 1].astype(int), iter] * def_rating[
-                                data[1][i, 0].astype(int), iter] + K * np.sqrt(
-                                H * off_rating[data[1][i, 0].astype(int), iter] * def_rating[
-                                    data[1][i, 1].astype(int), iter] * off_rating[data[1][i, 1].astype(int), iter] *
-                                def_rating[data[1][i, 0], iter]))
+        input_data[1][i, 5] = H * off_rating[input_data[1][i, 0].astype(int), iter] * def_rating[
+            input_data[1][i, 1].astype(int), iter] / (
+                            H * off_rating[input_data[1][i, 0].astype(int), iter] * def_rating[input_data[1][i, 1].astype(int), iter] +
+                            off_rating[input_data[1][i, 1].astype(int), iter] * def_rating[
+                                input_data[1][i, 0].astype(int), iter] + K * np.sqrt(
+                                H * off_rating[input_data[1][i, 0].astype(int), iter] * def_rating[
+                                    input_data[1][i, 1].astype(int), iter] * off_rating[input_data[1][i, 1].astype(int), iter] *
+                                def_rating[input_data[1][i, 0], iter]))
         # Probability for Tie
-        data[1][i, 6] = K * np.sqrt(
-            H * off_rating[data[1][i, 0].astype(int), iter] * def_rating[data[1][i, 1].astype(int), iter] * off_rating[
-                data[1][i, 1].astype(int), iter] * def_rating[data[1][i, 0].astype(int), iter]) / (
-                            H * off_rating[data[1][i, 0].astype(int), iter] * def_rating[data[1][i, 1].astype(int), iter] +
-                            off_rating[data[1][i, 1].astype(int), iter] * def_rating[
-                                data[1][i, 0].astype(int), iter] + K * np.sqrt(
-                                H * off_rating[data[1][i, 0].astype(int), iter] * def_rating[
-                                    data[1][i, 1].astype(int), iter] * off_rating[data[1][i, 1].astype(int), iter] *
-                                def_rating[data[1][i, 0].astype(int), iter]))
+        input_data[1][i, 6] = K * np.sqrt(
+            H * off_rating[input_data[1][i, 0].astype(int), iter] * def_rating[input_data[1][i, 1].astype(int), iter] * off_rating[
+                input_data[1][i, 1].astype(int), iter] * def_rating[input_data[1][i, 0].astype(int), iter]) / (
+                            H * off_rating[input_data[1][i, 0].astype(int), iter] * def_rating[input_data[1][i, 1].astype(int), iter] +
+                            off_rating[input_data[1][i, 1].astype(int), iter] * def_rating[
+                                input_data[1][i, 0].astype(int), iter] + K * np.sqrt(
+                                H * off_rating[input_data[1][i, 0].astype(int), iter] * def_rating[
+                                    input_data[1][i, 1].astype(int), iter] * off_rating[input_data[1][i, 1].astype(int), iter] *
+                                def_rating[input_data[1][i, 0].astype(int), iter]))
         # Probability for Away Win
-        data[1][i, 7] = off_rating[data[1][i, 1].astype(int), iter] * def_rating[data[1][i, 0].astype(int), iter] / (
-            H * off_rating[data[1][i, 0].astype(int), iter] * def_rating[data[1][i, 1].astype(int), iter] + off_rating[
-                data[1][i, 1].astype(int), iter] * def_rating[data[1][i, 0].astype(int), iter] + K * np.sqrt(
-                H * off_rating[data[1][i, 0].astype(int), iter] * def_rating[data[1][i, 1].astype(int), iter] * off_rating[
-                    data[1][i, 1].astype(int), iter] * def_rating[data[1][i, 0].astype(int), iter]))
+        input_data[1][i, 7] = off_rating[input_data[1][i, 1].astype(int), iter] * def_rating[input_data[1][i, 0].astype(int), iter] / (
+            H * off_rating[input_data[1][i, 0].astype(int), iter] * def_rating[input_data[1][i, 1].astype(int), iter] + off_rating[
+                input_data[1][i, 1].astype(int), iter] * def_rating[input_data[1][i, 0].astype(int), iter] + K * np.sqrt(
+                H * off_rating[input_data[1][i, 0].astype(int), iter] * def_rating[input_data[1][i, 1].astype(int), iter] * off_rating[
+                    input_data[1][i, 1].astype(int), iter] * def_rating[input_data[1][i, 0].astype(int), iter]))
 
     # Calculate SPI
     # SPI is always calculated assuming nog games have been played (i.e. a round robin between all teams)
     SPI = np.matrix(np.zeros(number_of_teams)).transpose()
     for i in range(number_of_teams):
         for j in range(total_games):
-            if data[1][j, 0] == i:  # Home Team
-                SPI[i, 0] = SPI[i, 0] + (3 * data[1][j, 5] + 1 * data[1][j, 6] + 0 * data[1][j, 7]) / 3
-            if data[1][j, 1] == i:  # Away Team
-                SPI[i, 0] = SPI[i, 0] + (0 * data[1][j, 5] + 1 * data[1][j, 6] + 3 * data[1][j, 7]) / 3
+            if input_data[1][j, 0] == i:  # Home Team
+                SPI[i, 0] = SPI[i, 0] + (3 * input_data[1][j, 5] + 1 * input_data[1][j, 6] + 0 * input_data[1][j, 7]) / 3
+            if input_data[1][j, 1] == i:  # Away Team
+                SPI[i, 0] = SPI[i, 0] + (0 * input_data[1][j, 5] + 1 * input_data[1][j, 6] + 3 * input_data[1][j, 7]) / 3
         SPI[i, 0] = SPI[i, 0] / (2 * total_games / number_of_teams)
 
     print('SPI Algorithm finished')
 
 
-    output = list([[data[0], np.concatenate((SPI, off_rating[:, iter], def_rating[:, iter]), axis=1)], data[1]])
+    output = list([[input_data[0], np.concatenate((SPI, off_rating[:, iter], def_rating[:, iter]), axis=1)], input_data[1]])
 
     # Output is a list of 2 items
     # [0]:  List of 2 things

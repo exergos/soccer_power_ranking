@@ -32,19 +32,6 @@ class elo_data(models.Model):
 for i in range(16):
     elo_data.add_to_class('finish_%s' % (i+1), models.DecimalField(max_digits= 65, decimal_places= 30))
 
-class game_situations(models.Model):
-    # To loop through field names and field values in template
-    def get_fields(self):
-        return [(field.name, field.value_to_string(self)) for field in game_situations._meta.fields]
-    # Field 1: Minute
-    minute = models.DecimalField(max_digits= 65, decimal_places= 0)
-    # Field 2: Score difference (Delta)
-    delta = models.DecimalField(max_digits= 65, decimal_places= 0)
-    # Field 3: End Result
-    result = models.DecimalField(max_digits= 65, decimal_places= 0)
-    # Field 4: Home Win Chance
-    chance = models.DecimalField(max_digits= 65, decimal_places= 30)
-
 class game_data(models.Model):
     # To loop through field names and field values in template
     def get_fields(self):
@@ -58,6 +45,7 @@ class game_data(models.Model):
     #                           output[season][game]["visitor"]
     #                           output[season][game]["host_goal"]
     #                           output[season][game]["visitor_goal"]
+    #                           output[season][game]["result"]
     #                           output[season][game]["referee"]
     #                           output[season][game]["stadium"]
     #                           output[season][game]["spectators"]
@@ -80,6 +68,7 @@ class game_data(models.Model):
     visitor = models.TextField(default='')
     host_goal = models.TextField(default='')
     visitor_goal = models.TextField(default='')
+    result = models.TextField(default='')
     referee = models.TextField(default='')
     stadium = models.TextField(default='')
     spectators = models.TextField(default='')
@@ -99,3 +88,6 @@ class game_data(models.Model):
 # Other fields: All possible minutes
 for i in range(90):
     game_data.add_to_class('minute_%s' % (i+1), models.IntegerField(default=0))
+    game_data.add_to_class('minute_%s_host' % (i+1), models.IntegerField(default=0))
+    game_data.add_to_class('minute_%s_tie' % (i+1), models.IntegerField(default=0))
+    game_data.add_to_class('minute_%s_visitor' % (i+1), models.IntegerField(default=0))

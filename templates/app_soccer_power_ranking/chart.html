@@ -19,12 +19,13 @@
             {#Customize chart using options#}
             {#https://developers.google.com/chart/interactive/docs/customizing_axes#}
             var options = {
-                title: 'Game Minute Chances'
+                title: 'Game Minute Chances',
+                isStacked: true
             };
 
             var data = google.visualization.arrayToDataTable({{ game_chart |safe }});
 
-            var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+            var chart = new google.visualization.SteppedAreaChart(document.getElementById('chart_div'));
             chart.draw(data, options);
         }
     </script>
