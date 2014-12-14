@@ -158,6 +158,15 @@ def elo(input_data, simulations = 10000):
 
     output = list([[input_data[0], elo_rating_after_game[-1,:]], input_data[1]])
 
+    # For every team, the evolution of their ELO rating
+    elo_evolution = list()
+    for i in range(number_of_teams):
+        elo_evolution.append(list())
+        indexes = np.unique(elo_rating_after_game[:,i],return_index = True)[1]
+        elo_evolution[i] = [elo_rating_after_game[index,i] for index in sorted(indexes)]
+        if elo_evolution[i][0] == 1500:
+            del elo_evolution[i][0]
+
     # Output is a list of 2 items
     # [0]:  List of 2 things
     #       [0][0]: Team names of all teams in Jupiler Pro League
@@ -178,7 +187,7 @@ def elo(input_data, simulations = 10000):
     from app_soccer_power_ranking.algorithms.montecarlo import montecarlo
     output = montecarlo(output,simulations)
 
-    return list([output, input_data])
+    return list([output, input_data,elo_evolution])
 
 # Add probability data to upcoming games (from spi and elo)
 def extend_upcoming_prob(input_data_game,input_data_team, algorithm):
@@ -188,4 +197,32 @@ def extend_upcoming_prob(input_data_game,input_data_team, algorithm):
                 input_data_game[0][i]["host_" + algorithm] = input_data_team[1][j,5]
                 input_data_game[0][i]["tie_" + algorithm] = input_data_team[1][j,6]
                 input_data_game[0][i]["visitor_" + algorithm] = input_data_team[1][j,7]
+
     return input_data_game
+
+def upset(input_data):
+    # only for last season
+    for i in range(len(input_data[0])):
+        if input_data[0][i]["played"] == "1":
+            # Max chance of host win
+            if input_data[0][i]["host_elo"] == max(input_data[0][i]["host_elo"],input_data[0][i]["tie_elo"],input_data[0][i]["visitor_elo"]):
+                input_data[0][i]["upset"] = 1 - input_data[0][i]["host_elo"] + abs(int(input_data[0][i]["host_goal"])-int(input_data[0][i]["visitor_goal"]))*input_data[0][i]["host_elo"]/10
+            else:
+                if input_data[0][i]["tie_elo"] == max(input_data[0][i]["host_elo"],input_data[0][i]["tie_elo"],input_data[0][i]["visitor_elo"]):
+                    input_data[0][i]["upset"] = 1 - input_data[0][i]["tie_elo"] + abs(int(input_data[0][i]["host_goal"])-int(input_data[0][i]["visitor_goal"]))*input_data[0][i]["tie_elo"]/10
+                else:
+                    input_data[0][i]["upset"] = 1 - input_data[0][i]["visitor_elo"] + abs(int(input_data[0][i]["host_goal"])-int(input_data[0][i]["visitor_goal"]))*input_data[0][i]["visitor_elo"]/10
+
+    return input_data
+
+def excitement(input_data):
+    # only for last season
+    for i in range(len(input_data[0])):
+        if input_data[0][i]["played"] == "1":
+            for j in range(1,90):
+                change_host = abs(input_data[0][i]["minute_" + str(j+1) + "_host"]-input_data[0][i]["minute_" + str(j) + "_host"])
+                change_tie = abs(input_data[0][i]["minute_" + str(j+1) + "_tie"]-input_data[0][i]["minute_" + str(j) + "_tie"])
+                change_visitor = abs(input_data[0][i]["minute_" + str(j+1) + "_visitor"]-input_data[0][i]["minute_" + str(j) + "_visitor"])
+                input_data[0][i]["excitement"] = change_host + change_tie + change_visitor
+
+    return input_data

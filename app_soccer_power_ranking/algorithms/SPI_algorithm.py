@@ -252,4 +252,4 @@ def spi(input_data, simulations = 10000):
     from app_soccer_power_ranking.algorithms.montecarlo import montecarlo
     output = montecarlo(output,simulations)
 
-    return list([output, input_data[1]])
+    return list([output, input_data])

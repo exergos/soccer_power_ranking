@@ -4,11 +4,11 @@ from django.db import models
 
 class spi_data(models.Model):
     # Field 1: Team Name
-    team = models.CharField(max_length=30)
+    team = models.TextField(default='')
     # Other fields: SPI, off rating, def rating
-    spi = models.DecimalField(max_digits= 65, decimal_places= 2)
-    off_rating = models.DecimalField(max_digits = 65, decimal_places = 2)
-    def_rating = models.DecimalField(max_digits = 65, decimal_places = 2)
+    spi = models.DecimalField(max_digits= 65, decimal_places= 2,default=0)
+    off_rating = models.DecimalField(max_digits = 65, decimal_places = 2,default=0)
+    def_rating = models.DecimalField(max_digits = 65, decimal_places = 2,default=0)
 
     # To loop through field names and field values in template
     def get_fields(self):
@@ -16,13 +16,13 @@ class spi_data(models.Model):
 
 # Other fields: possible league finishes (1 to 16)
 for i in range(16):
-    spi_data.add_to_class('finish_%s' % (i+1), models.DecimalField(max_digits= 65, decimal_places= 30))
+    spi_data.add_to_class('finish_%s' % (i+1), models.DecimalField(max_digits= 30, decimal_places= 15,default=0))
 
 class elo_data(models.Model):
     # Field 1: Team Name
-    team = models.CharField(max_length=30)
+    team = models.TextField(default='')
     # Other fields: SPI, off rating, def rating
-    elo = models.DecimalField(max_digits= 65, decimal_places= 2)
+    elo = models.DecimalField(max_digits= 30, decimal_places= 2,default=0)
 
     # To loop through field names and field values in template
     def get_fields(self):
@@ -30,7 +30,11 @@ class elo_data(models.Model):
 
 # Other fields: possible league finishes (1 to 16)
 for i in range(16):
-    elo_data.add_to_class('finish_%s' % (i+1), models.DecimalField(max_digits= 65, decimal_places= 30))
+    elo_data.add_to_class('finish_%s' % (i+1), models.DecimalField(max_digits= 30, decimal_places= 15,default=0))
+
+# Other fields: possible league finishes (1 to 16)
+for i in range(5):
+    elo_data.add_to_class('elo_min%s' % i, models.DecimalField(max_digits= 30, decimal_places= 15,default=0))
 
 class standings(models.Model):
     # To loop through field names and field values in template
@@ -38,7 +42,7 @@ class standings(models.Model):
         return [(field.name, field.value_to_string(self)) for field in game_data._meta.fields]
 
     # Field 1: Team Name
-    team = models.CharField(max_length=30)
+    team = models.TextField(default='')
     # Other fields: SPI, off rating, def rating
     games = models.IntegerField(default=0)
     win = models.IntegerField(default=0)
@@ -52,10 +56,6 @@ class standings(models.Model):
     # To loop through field names and field values in template
     def get_fields(self):
         return [(field.name, field.value_to_string(self)) for field in elo_data._meta.fields]
-
-# Other fields: possible league finishes (1 to 16)
-for i in range(16):
-    elo_data.add_to_class('finish_%s' % (i+1), models.DecimalField(max_digits= 65, decimal_places= 30))
 
 class game_data(models.Model):
     # To loop through field names and field values in template
@@ -111,16 +111,18 @@ class game_data(models.Model):
     visitor_substitution = models.TextField(default='')
     host_manager = models.TextField(default='')
     visitor_manager = models.TextField(default='')
-    host_elo = models.DecimalField(max_digits= 65, decimal_places= 30)
-    tie_elo = models.DecimalField(max_digits= 65, decimal_places= 30)
-    visitor_elo = models.DecimalField(max_digits= 65, decimal_places= 30)
-    host_spi = models.DecimalField(max_digits= 65, decimal_places= 30)
-    tie_spi = models.DecimalField(max_digits= 65, decimal_places= 30)
-    visitor_spi = models.DecimalField(max_digits= 65, decimal_places= 30)
+    host_elo = models.DecimalField(max_digits= 30, decimal_places= 15,default=0)
+    tie_elo = models.DecimalField(max_digits= 30, decimal_places= 15,default=0)
+    visitor_elo = models.DecimalField(max_digits= 30, decimal_places= 15,default=0)
+    host_spi = models.DecimalField(max_digits= 30, decimal_places= 15,default=0)
+    tie_spi = models.DecimalField(max_digits= 30, decimal_places= 15,default=0)
+    visitor_spi = models.DecimalField(max_digits= 30, decimal_places= 15,default=0)
+    upset = models.DecimalField(max_digits= 30, decimal_places= 15,default=0)
+    excitement = models.DecimalField(max_digits= 30, decimal_places= 15,default=0)
 
 # Other fields: All possible minutes
 for i in range(90):
     game_data.add_to_class('minute_%s' % (i+1), models.IntegerField(default=0))
-    game_data.add_to_class('minute_%s_host' % (i+1), models.DecimalField(max_digits= 65, decimal_places= 30))
-    game_data.add_to_class('minute_%s_tie' % (i+1), models.DecimalField(max_digits= 65, decimal_places= 30))
-    game_data.add_to_class('minute_%s_visitor' % (i+1), models.DecimalField(max_digits= 65, decimal_places= 30))
+    game_data.add_to_class('minute_%s_host' % (i+1), models.DecimalField(max_digits= 30, decimal_places= 15,default=0))
+    game_data.add_to_class('minute_%s_tie' % (i+1), models.DecimalField(max_digits= 30, decimal_places= 15,default=0))
+    game_data.add_to_class('minute_%s_visitor' % (i+1), models.DecimalField(max_digits= 30, decimal_places= 15,default=0))
