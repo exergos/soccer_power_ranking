@@ -38,7 +38,7 @@ __project__ = 'SPI_JupilerProLeague'
 def elo(input_data, simulations = 10000):
     import numpy as np
     import scipy.stats # For Poisson Distribution, numpy doesn't have it
-    from app_soccer_power_ranking.algorithms.game_to_team_data import game_to_team
+    from app_soccer_power_ranking.algorithms.game_to_team import game_to_team
     input_data = game_to_team(input_data)
 
     # input_data is a list of 2 lists:
@@ -178,4 +178,14 @@ def elo(input_data, simulations = 10000):
     from app_soccer_power_ranking.algorithms.montecarlo import montecarlo
     output = montecarlo(output,simulations)
 
-    return output
+    return list([output, input_data])
+
+# Add probability data to upcoming games (from spi and elo)
+def extend_upcoming_prob(input_data_game,input_data_team, algorithm):
+    for i in range(len(input_data_game[0])):
+        for j in range(len(input_data_team[1])):
+            if input_data_game[0][i]["host"] == input_data_team[0][int(input_data_team[1][j,0])] and input_data_game[0][i]["visitor"] == input_data_team[0][int(input_data_team[1][j,1])]:
+                input_data_game[0][i]["host_" + algorithm] = input_data_team[1][j,5]
+                input_data_game[0][i]["tie_" + algorithm] = input_data_team[1][j,6]
+                input_data_game[0][i]["visitor_" + algorithm] = input_data_team[1][j,7]
+    return input_data_game

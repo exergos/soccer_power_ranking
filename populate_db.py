@@ -1,6 +1,7 @@
 # This file will populate database
 
 import os
+import numpy as np
 
 def populate():
     # Remove previous data in table
@@ -15,6 +16,21 @@ def populate():
     # Import previous file
     import pickle
     input_data = pickle.load(open("app_soccer_power_ranking/algorithms/data/sporza.p", "rb"))  # load from file sporza.p
+
+    # Standings
+    # Remove previous data
+    standings.objects.all().delete()
+
+    # Generate new data
+    import app_soccer_power_ranking.algorithms.game_to_team as gtt
+    standings = gtt.game_to_team(input_data)
+
+    # Fill database
+    for i in range(len(standings[2])): # For every team
+    d_standings = {'team' : standings[0][i],'games' : standings[2][i,0], 'win' : standings[2][i,1], 'loss' : standings[2][i,2], 'tie' : standings[2][i,3], 'goals_for' : standings[2][i,4], 'goals_against' : standings[2][i,5], 'goal_difference' : standings[2][i,6], 'points' : standings[2][i,7]}
+
+    standings.objects.create(**d_standings)
+
 
     # SPI
     # Remove previous data
@@ -35,14 +51,14 @@ def populate():
     # [1]:  A size (number_of_teams x number_of_teams) matrix with the percentage chance of every team to end up in every
     #       possible league position
 
-    for i in range(len(output_spi[0][0])): # For every team
+    for i in range(len(output_spi[0][0][0])): # For every team
         # this returns a dict with the property
         # name as key and the property val as its value
 
         # d is dictionary of field names and values
-        d_spi = {'Team' : output_spi[0][0][i],'SPI' : output_spi[0][1][i,0], 'off_rating' : output_spi[0][1][i,1], 'def_rating' : output_spi[0][1][i,2]}
+        d_spi = {'team' : output_spi[0][0][0][i],'spi' : output_spi[0][0][1][i,0], 'off_rating' : output_spi[0][0][1][i,1], 'def_rating' : output_spi[0][0][1][i,2]}
         for j in range(16):
-            d_spi['finish_%s' % (j+1)] = output_spi[1][i,j]
+            d_spi['finish_%s' % (j+1)] = output_spi[0][0][1][i,j]
 
         spi_data.objects.create(**d_spi)
 
@@ -63,20 +79,25 @@ def populate():
     # [1]:  A size (number_of_teams x number_of_teams) matrix with the percentage chance of every team to end up in every
     #       possible league position
 
-    for i in range(len(output_elo[0][0])): # For every team
+    for i in range(len(output_elo[0][0][0])): # For every team
         # this returns a dict with the property
         # name as key and the property val as its value
 
         # d is dictionary of field names and values
-        d_elo = {'Team' : output_elo[0][0][i],'ELO' : output_elo[0][1][i]}
+        d_elo = {'team' : output_elo[0][0][0][i],'elo' : output_elo[0][0][1][i]}
         for j in range(16):
-            d_elo['finish_%s' % (j+1)] = output_elo[1][i,j]
+            d_elo['finish_%s' % (j+1)] = output_elo[0][0][1][i,j]
 
         elo_data.objects.create(**d_elo)
 
     # Game Data
     # Remove previous data
     game_data.objects.all().delete()
+
+    # Extend input_data with SPI and ELO
+    from app_soccer_power_ranking.algorithms.ELO_algorithm import extend_upcoming_prob
+    input_data = extend_upcoming_prob(input_data, output_elo[1], "elo")
+    input_data = extend_upcoming_prob(input_data, output_spi[1], "spi")
 
     # Fill table with all this data
     for season in range(len(input_data)): #delta (goal difference)
@@ -91,6 +112,7 @@ if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_soccer_power_ranking.settings')
     from app_soccer_power_ranking.models import spi_data
     from app_soccer_power_ranking.models import elo_data
+    from app_soccer_power_ranking.models import standings
     from app_soccer_power_ranking.models import game_data
 
     populate()

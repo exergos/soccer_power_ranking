@@ -16,22 +16,13 @@ __author__ = 'Exergos'
 ######################
 # What does it return?
 ######################
-# If sporza_small() is called (algorithm="spi" or "elo"):
-# Returns a list of 2 items
-# [0]:  Team names of all teams in Jupiler Pro League
-# [1]:  Array of size (total games x 4)
-#       [1][:,0]: Home Team (As a number, alphabetically as in [0]
-#       [1][:,1]: Away Team (As a number, alphabetically as in [0]
-#       [1][:,2]: Home Team Goals
-#       [1][:,3]: Away Team Goals
-#       [1][:,4]: Game already played (1 = yes, 0 = no)
 
-# If sporza_big(number_of_seasons) is called:
 # output[season][game] =    dict()
 #                           output[season][game]["game_date"]
 #                           output[season][game]["game_hour"]
 #                           output[season][game]["host"]
 #                           output[season][game]["visitor"]
+#                           output[season][game]["result"]
 #                           output[season][game]["host_goal"]
 #                           output[season][game]["visitor_goal"]
 #                           output[season][game]["referee"]
@@ -140,6 +131,63 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
         # Games in Season i
         games = season_page.find_all("a", class_=["finished"])
 
+        # Games still to play in Season i
+        games_upcoming = season_page.find_all("a", class_=["upcoming"])
+
+        games_upcoming_soup = []
+        for j in range(len(games_upcoming)): # range(len(games))
+            games_upcoming_soup.append(BeautifulSoup(urllib.request.urlopen('http://sporza.be' + games_upcoming[j]['href'])))
+
+        # Check how many games are new and added to sporza.p
+        new_upcoming_games = []
+
+        if i == 0 and algorithm == "update": # Update latest season only
+            for j in range(len(games_upcoming_soup)): # range(len(games))
+                game_date = games_upcoming_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[0]
+                host = games_upcoming_soup[j].find_all("dt")[0].get_text().replace('\n','')
+
+                match = 0
+                for k in range(len(input_data[i])):
+                    if input_data[i][k]["game_date"] == game_date and input_data[i][k]["host"] == host:
+                        match = 1
+                        continue
+                if match == 0:
+                        new_upcoming_games.append(j)
+        else:
+            new_upcoming_games = list(range(len(games_upcoming_soup)))
+
+            # Append list for game j in season i
+            output.append(list())
+
+        count_upcoming_games = 0
+        for j in new_upcoming_games:
+            output[i].append(list())
+            # Save all categories in dict
+            if algorithm == "new":
+                output_index = count_upcoming_games
+            else:
+                if i == 0:
+                    output_index = len(input_data[i])+count_upcoming_games
+                else:
+                    output_index = count_upcoming_games
+
+            output[i][output_index] = dict()
+
+            # Add data for new game
+            # Game Date
+            output[i][output_index]["game_date"] = games_upcoming_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[0]
+
+            # Host
+            output[i][output_index]["host"] = games_upcoming_soup[j].find_all("dt")[0].get_text().replace('\n','')
+
+            # Visitor
+            output[i][output_index]["visitor"] = games_upcoming_soup[j].find_all("dt")[1].get_text().replace('\n','')
+
+            # Played?
+            output[i][output_index]["played"] = "0"
+
+            count_upcoming_games = count_upcoming_games + 1
+
         # Check how many games are new and added to sporza.p
         new_games = []
         
@@ -155,33 +203,31 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
 
                 match = 0
                 for k in range(len(input_data[i])):
-                    if input_data[i][k]["game_date"] == game_date and input_data[i][k]["host"] == host:
+                    if input_data[i][k]["game_date"] == game_date and input_data[i][k]["host"] == host and input_data[i][k]["played"] == "1":
                         match = 1
+                        continue
+                    if input_data[i][k]["game_date"] == game_date and input_data[i][k]["host"] == host and input_data[i][k]["played"] == "0":
+                        match = 0
+                        # Remove upcoming game (to be replaced by finished game)
+                        del output[i][k]
                         continue
                 if match == 0:
                         new_games.append(j)
-
-                        # Append list for game j in season i
-                        output[i].append(list())
         else:
             new_games = list(range(len(games_soup)))
-            
-            # Append list for game j in season i
-            output.append(list())
-            for k in range(len(new_games)):
-                output[i].append(list())
 
         #  For game j
         count_games = 0
         for j in new_games: # range(len(games))
+            output[i].append(list())
             # Save all categories in dict
             if algorithm == "new":
-                output_index = j
+                output_index = count_upcoming_games + count_games
             else:
                 if i == 0:
-                    output_index = len(input_data[i])+count_games
+                    output_index = len(input_data[i])+ count_upcoming_games + count_games
                 else:
-                    output_index = j
+                    output_index = count_upcoming_games + count_games
 
             output[i][output_index] = dict()
 
@@ -197,6 +243,9 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
 
             # Visitor
             output[i][output_index]["visitor"] = games_soup[j].find_all("dt")[1].get_text().replace('\n','')
+
+            # Played?
+            output[i][output_index]["played"] = "1"
 
             # Host goals
             output[i][output_index]["host_goal"] = games_soup[j].find_all("dd",class_=["score"])[0].get_text().replace('\n','')
@@ -304,97 +353,7 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
         
     return output
 
-# sporza_small gets only results, and only for one season
-def sporza_small():
-    from bs4 import BeautifulSoup
-    import urllib.request
-    import numpy as np
-
-    # Open Website & Scrape Data
-    soup = []
-    page_x = urllib.request.urlopen('http://sporza.be/cm/sporza/matchcenter/mc_voetbal/jupilerleague_1415')
-    soup.append(BeautifulSoup(page_x))
-
-    # Find all teams, home teams and scores for every game
-    teams = []
-    team_home = []
-    team_away = []
-    score_home = []
-    score_away = []
-    games_played = []
-
-    scores_raw = soup[0].find_all("a", class_=["finished", "upcoming","in_play"])
-    number_of_teams = 1
-    for i in range(len(scores_raw)):
-        if scores_raw[i]['class'][0] == "finished" and (
-                    '/' not in scores_raw[i].getText()):  # Second part is to eliminate postponed games
-            games_played.append(i)
-            team_home.append(scores_raw[i].parent.parent.find("abbr")["title"])
-            score_home.append(float(scores_raw[i].getText().replace('\n', '').split('-')[0]))
-            score_away.append(float(scores_raw[i].getText().replace('\n', '').split('-')[1]))
-            if len(teams) == 0:  # First team added
-                teams.append(scores_raw[i].parent.parent.find("abbr")["title"])
-            else:
-                if scores_raw[i].parent.parent.find("abbr")["title"] is not teams[number_of_teams - 1]:
-                    teams.append(scores_raw[i].parent.parent.find("abbr")["title"])
-                    number_of_teams = number_of_teams + 1
-
-    # Find away teams
-    team_away_dummy = []
-    for i in range(number_of_teams):
-        a = list(teams)
-        a.pop(i)
-        team_away_dummy.append(a)
-    team_away_dummy = sum(team_away_dummy, [])  # Make one list from list of lists
-
-    for i in range(len(games_played)):
-        team_away.append(team_away_dummy[games_played[i]])
-
-    # Change team_home and team_away from strings to numbers (based on ranking in teams list)
-    # This is easier for future calculations
-    for i in range(len(team_home)):
-        for j in range(len(teams)):
-            if team_home[i] == teams[j]:
-                team_home[i] = j
-            if team_away[i] == teams[j]:
-                team_away[i] = j
-
-    # Aggregate game data in one array
-    game_data = np.zeros((len(team_home), 4))
-    game_data[:, 0] = team_home
-    game_data[:, 1] = team_away
-    game_data[:, 2] = score_home
-    game_data[:, 3] = score_away
-
-    # Expand game_data to include games not played!
-    # Extra rows for games not played, extra column(4) for information about game (1 = played, 0 = not played)
-    # Define some parameters that will help with reading the code
-    total_games = number_of_teams * (number_of_teams - 1)
-    games_played = len(game_data)
-    games_not_played = total_games - games_played
-
-    game_data = np.r_[game_data, np.zeros((games_not_played, game_data.shape[1]))]
-    game_data = np.c_[game_data, np.zeros((total_games, 1))]
-    count = 0
-    for i in range(number_of_teams):  # Home Team
-        for j in range(number_of_teams):  # Away Team
-            played = 0
-            if (i is not j):
-                # Check to see if played
-                for k in range(games_played):
-                    if game_data[k, 0] == i and game_data[k, 1] == j:
-                        played = 1
-                        game_data[k, 4] = played
-                if played == 0:
-                    game_data[games_played + count, 0] = i
-                    game_data[games_played + count, 1] = j
-                    game_data[games_played + count, 4] = played
-                    count = count + 1
-
-    # What does module return?
-    return list([teams, game_data])
-
-# helper function for sporza_big
+# helper function for sporza_scrape()
 def sporza_scrape_function(first_half,halftime,second_half,info):
     # Take into account first and second yellow
     if info == "host yellow_card" or info == "visitor yellow_card":
@@ -442,6 +401,8 @@ def sporza_extend_gd(input_data):
     for i in range(len(input_data)):
         # For every game j
         for j in range(len(input_data[i])):
+            if input_data[i][j]["played"] == "0":
+                continue
             # Dummy array:
             game_minute_dummy = np.zeros((minutes,2))
 
@@ -550,20 +511,14 @@ def sporza_extend_gm(input_data, goal_difference = 16):
     for i in range(len(input_data)):
         # For every game j
         for j in range(len(input_data[i])):
+            if input_data[i][j]["played"] == "0":
+                continue
             # For every minute k
             for k in range(minutes):
                 # Check to see if game minutes input_data available
                 if input_data[i][j] is not []:
                     gd = str(int(input_data[i][j]["minute_" + str(int(k+1))]))
-                    # Decide winner (+1: home team win; 0: tie;-1: away team win)
-                    if int(input_data[i][j]["host_goal"]) > int(input_data[i][j]["visitor_goal"]):
-                       gr = str(1)
-                    else:
-                        if int(input_data[i][j]["host_goal"]) == int(input_data[i][j]["visitor_goal"]):
-                            gr = str(0)
-                        else:
-                            gr = str(-1)
-                    game_minute_chances[gd][gr]["minute_" + str(int(k+1))] = game_minute_chances[gd][gr]["minute_" + str(int(k+1))] + 1
+                    game_minute_chances[gd][input_data[i][j]["result"]]["minute_" + str(int(k+1))] = game_minute_chances[gd][input_data[i][j]["result"]]["minute_" + str(int(k+1))] + 1
 
     # Make percentage chances of all occurrences
     # For every goal difference
@@ -582,6 +537,8 @@ def sporza_extend_gm(input_data, goal_difference = 16):
     # For every minute
     for i in range(len(input_data)):
         for j in range(len(input_data[i])):
+            if input_data[i][j]["played"] == "0":
+                continue
             for k in range(minutes):
                 gd = str(int(input_data[i][j]["minute_" + str(int(k+1))]))
                 input_data[i][j]["minute_" + str(int(k+1)) + "_host"] = game_minute_chances[gd]["1"]["minute_" + str(int(k+1))]

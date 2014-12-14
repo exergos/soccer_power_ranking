@@ -34,7 +34,7 @@ __project__ = 'SPI_JupilerProLeague'
 ########################################################################################################################
 def spi(input_data, simulations = 10000):
     import numpy as np
-    from app_soccer_power_ranking.algorithms.game_to_team_data import game_to_team
+    from app_soccer_power_ranking.algorithms.game_to_team import game_to_team
     input_data = game_to_team(input_data)
 
     # input_data a list of 2 lists
@@ -252,4 +252,4 @@ def spi(input_data, simulations = 10000):
     from app_soccer_power_ranking.algorithms.montecarlo import montecarlo
     output = montecarlo(output,simulations)
 
-    return output
+    return list([output, input_data[1]])
