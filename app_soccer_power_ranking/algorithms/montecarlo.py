@@ -93,6 +93,9 @@ def montecarlo(data, simulations, actual = 0):
     # points is matrix of size number_of_teams x simulation
     # unsorted (teams alphabetically) points for every team in every season
     points = np.zeros((number_of_teams, simulations))
+    wins = np.zeros((number_of_teams, simulations))
+    ties = np.zeros((number_of_teams, simulations))
+    losses = np.zeros((number_of_teams, simulations))
 
     # league_ranking is matrix of size number_of_teams x simulation
     # sorted (descending) index of team on that position
@@ -103,21 +106,38 @@ def montecarlo(data, simulations, actual = 0):
                 if data[1][j, 0] == k:  # Home Team
                     if simulation_matrix[j, i] == 0:  # Home Team Victory
                         points[k, i] += 3
+                        wins[k, i] += 1
                     if simulation_matrix[j, i] == 1:  # Tie
                         points[k, i] += 1
+                        ties[k, i] += 1
                     if simulation_matrix[j, i] == 2:  # Away Team Victory
                         points[k, i] += 0
+                        losses[k, i] += 1
                 if data[1][j, 1] == k:  # Away team
                     if simulation_matrix[j, i] == 0:  # Home Team Victory
                         points[k, i] += 0
+                        losses[k, i] += 1
                     if simulation_matrix[j, i] == 1:  # Tie
                         points[k, i] += 1
+                        ties[k, i] += 1
                     if simulation_matrix[j, i] == 2:  # Away Team Victory
                         points[k, i] += 3
+                        wins[k, i] += 1
+
+        # Make ranking for this simulation
+        # 1. Sort by points
         league_ranking[:, i] = np.argsort(points[:, i])[::-1]  # Best Team index [0], Worst team index [15]
 
+        # 2. If same amount of points, most wins
+        for j in range(1,len(points)):
+            if points[league_ranking[j,i],i] == points[league_ranking[j-1,i],i]:
+                if wins[league_ranking[j,i],i] > wins[league_ranking[j-1,i],i]:
+                    league_ranking[j,i],league_ranking[j-1,i] = league_ranking[j-1,i],league_ranking[j,i]
+
+        # 3. Goal difference
+
     sim_end = time.time()
-    print('League Ranking Distribution finished in ', sim_end - sim_start,'seconds')
+    print('League Ranking Distribution finished in', sim_end - sim_start,'seconds')
 
     # Average amount of points for every team
     # number_of_teams (ordered alphabetically) x 1 matrix
@@ -140,6 +160,6 @@ def montecarlo(data, simulations, actual = 0):
 
     # Round all numbers to 2 digits behind comma
     data[0][1] = np.around(data[0][1],2)
-    league_ranking_distribution = np.around(league_ranking_distribution,2)
+    league_ranking_distribution = np.around(league_ranking_distribution,5)
 
     return list([data[0],league_ranking_distribution])

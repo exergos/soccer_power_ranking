@@ -188,7 +188,7 @@ def elo(input_data, simulations = 10000):
     # This can in the future be used for soccer power ranking app
     # For now only output league ranking distribution data, based on montecarlo simulation:
     from app_soccer_power_ranking.algorithms.montecarlo import montecarlo
-    output = montecarlo(output,simulations)
+    output = montecarlo(output,simulations,actual=1)
 
     return list([output, input_data,elo_evolution])
 

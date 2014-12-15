@@ -250,6 +250,6 @@ def spi(input_data, simulations = 10000):
     # For now only output league ranking distribution data, based on montecarlo simulation:
 
     from app_soccer_power_ranking.algorithms.montecarlo import montecarlo
-    output = montecarlo(output,simulations)
+    output = montecarlo(output,simulations,actual=1)
 
     return list([output, input_data])
