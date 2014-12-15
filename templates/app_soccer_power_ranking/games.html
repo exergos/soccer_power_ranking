@@ -1,0 +1,64 @@
+{#Import static files (images/css/js/...):#}
+{% load staticfiles %}
+{#Import custom made template tags and filters:#}
+{% load app_soccer_power_ranking_extra_templates %}
+{#This import css file (static)#}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+<html>
+<head>
+    {#JQuery for basic tools#}
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    {#Tablesorter to make table sortable via columns#}
+    {#Added locally as a static file#}
+    <script src="{% static "js/tablesorter/jquery-latest.js" %}"></script>
+    <script src="{% static "js/tablesorter/jquery.tablesorter.js" %}"></script>
+    {#Google Charts#}
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    {#Script to load tablesorter, create charts and fill table#}
+    <script type="text/javascript">
+        {#On document ready, load stuff#}
+        $(document).ready(function()
+                {
+                    $("#games").tablesorter();
+
+                    $('#loading').remove();
+                }
+        );
+
+
+    </script>
+</head>
+<body>
+{#Load data#}
+
+{#<script>#}
+{#document.write("<p id='loading'>Loading...</p>");#}
+{#</script>#}
+
+{#SPI Table#}
+<table cellspacing='0' id="games" class="tablesorter">
+    {#    Make table headers#}
+
+    <thead>
+    <tr>
+        {% for header in games_headers %}
+            <th>{{ header }}</th>
+        {% endfor %}
+        <th>PROJ</th>
+    </tr>
+    </thead>
+    {#    Fill rest of table with data#}
+    <tbody>
+    {% for values in games_values %}
+        <tr>
+            {% for value in values %}
+                    <td>{{ value }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+
+</body>
+</html>

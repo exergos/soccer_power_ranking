@@ -58,25 +58,36 @@ def game_to_team(input_data):
     team_names = []
     team_names.append([])
     for i in range(len(games_played)):
+        # DIT IS PROBLEMATISCH BIJ NIEUW SEIZOEN, NOG NIET ELKE PLOEG HOST GEWEEST: OP TE LOSSEN
         team_names[0].append(input_data[0][games_played[i]]["host"])
     team_names[0] = sorted(set(team_names[0]))
     team_names.append([])
     team_names[1] = list(range(len(games_played)))
     number_of_teams = len(team_names[0])
 
+    # Sort games based on date
+    import time
+    dates = []
+    for i in range(total_games):
+        dates.append(time.strptime(input_data[0][i]["game_date"],"%d/%m/%Y"))
+
+    dates_sort_index = [i[0] for i in sorted(enumerate(dates), key=lambda x:x[1])]
+
     # Get game_data
     import numpy as np
     game_data = np.zeros((total_games, 5))
-    for i in range(total_games):
+    count_games = 0
+    for i in dates_sort_index:
         for j in range(number_of_teams):
             if input_data[0][i]["host"] == team_names[0][j]:
-                game_data[i,0] = team_names[1][j]
+                game_data[count_games,0] = team_names[1][j]
             if input_data[0][i]["visitor"] == team_names[0][j]:
-                game_data[i,1] = team_names[1][j]
+                game_data[count_games,1] = team_names[1][j]
         if input_data[0][i]["played"] == "1":
-            game_data[i,2] = int(input_data[0][i]["host_goal"])
-            game_data[i,3] = int(input_data[0][i]["visitor_goal"])
-            game_data[i,4] = 1
+            game_data[count_games,2] = int(input_data[0][i]["host_goal"])
+            game_data[count_games,3] = int(input_data[0][i]["visitor_goal"])
+            game_data[count_games,4] = 1
+        count_games = count_games + 1
 
     # Make ranking
     # Games Played - Wins - Losses - Ties - Goals For - Goals Against - Goal Diff - Points
@@ -128,8 +139,6 @@ def game_to_team(input_data):
 
                     # Win Visitor
                     team_data[game_data[i,1],1] = team_data[game_data[i,1],1] + 1
-
-
 
     # What does module return?
     return list([team_names[0], game_data, team_data])

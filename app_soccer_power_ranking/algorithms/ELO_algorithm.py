@@ -53,10 +53,10 @@ def elo(input_data, simulations = 10000):
     # Define some parameters that will help with reading the code
     number_of_teams = len(input_data[0])
     total_games = len(input_data[1])
-    games_played = 0
+    games_played = []
     for i in range(total_games):
         if input_data[1][i,4] == 1:
-            games_played = games_played + 1
+            games_played.append(i)
 
     # Calculate ELO using ELO Formula
     # ELO parameters
@@ -67,9 +67,10 @@ def elo(input_data, simulations = 10000):
     # Every team starts off with 1500 before season
     # Calculate through season
 
-    elo_rating_after_game = np.zeros((games_played,number_of_teams))
+    elo_rating_after_game = np.zeros((len(games_played),number_of_teams))
 
-    for i in range(games_played):
+    count_games_played = 0
+    for i in games_played:
         # Calculate W_home, W_away and G parameter for game
         if input_data[1][i,2] > input_data[1][i,3]: # Home Win
             W_home = 1
@@ -91,37 +92,39 @@ def elo(input_data, simulations = 10000):
                 G = (11 + abs(input_data[1][i,2] - input_data[1][i,3]))/8
 
         # Calculate ELO rating AFTER game
-        if i == 0: # First game of the season
+        if i == games_played[0]: # First game of the season
             # Home Team new ELO rating after game
             W_home_e = 1/(10**(-home_field_advantage/400)+1)
-            elo_rating_after_game[i,input_data[1][i,0]] = elo_start + K*G*(W_home-W_home_e)
+            elo_rating_after_game[count_games_played,input_data[1][i,0]] = elo_start + K*G*(W_home-W_home_e)
 
             # Away Team new ELO rating after game
             W_away_e = 1/(10**(home_field_advantage/400)+1)
-            elo_rating_after_game[i,input_data[1][i,1]] = elo_start + K*G*(W_away-W_away_e)
+            elo_rating_after_game[count_games_played,input_data[1][i,1]] = elo_start + K*G*(W_away-W_away_e)
         else:
             # Home Team new ELO rating after game
-            W_home_e = 1/(10**(-(elo_rating_after_game[i-1,input_data[1][i,0]]+home_field_advantage-elo_rating_after_game[i-1,input_data[1][i,1]])/400)+1)
-            elo_rating_after_game[i,input_data[1][i,0]] = elo_rating_after_game[i-1,input_data[1][i,0]] + K*G*(W_home-W_home_e)
+            W_home_e = 1/(10**(-(elo_rating_after_game[count_games_played-1,input_data[1][i,0]]+home_field_advantage-elo_rating_after_game[count_games_played-1,input_data[1][i,1]])/400)+1)
+            elo_rating_after_game[count_games_played,input_data[1][i,0]] = elo_rating_after_game[count_games_played-1,input_data[1][i,0]] + K*G*(W_home-W_home_e)
 
             # Away Team new ELO rating after game
-            W_away_e = 1/(10**(-(elo_rating_after_game[i-1,input_data[1][i,1]]-home_field_advantage-elo_rating_after_game[i-1,input_data[1][i,0]])/400)+1)
-            elo_rating_after_game[i,input_data[1][i,1]] = elo_rating_after_game[i-1,input_data[1][i,1]] + K*G*(W_away-W_away_e)
+            W_away_e = 1/(10**(-(elo_rating_after_game[count_games_played-1,input_data[1][i,1]]-home_field_advantage-elo_rating_after_game[count_games_played-1,input_data[1][i,0]])/400)+1)
+            elo_rating_after_game[count_games_played,input_data[1][i,1]] = elo_rating_after_game[count_games_played-1,input_data[1][i,1]] + K*G*(W_away-W_away_e)
 
         # For every team that didn't play, copy old elo into new spot
         for j in range(number_of_teams):
-            if elo_rating_after_game[i,j] == 0:
-                if i == 0:
-                    elo_rating_after_game[i,j] = elo_start
+            if elo_rating_after_game[count_games_played,j] == 0:
+                if i == games_played[0]:
+                    elo_rating_after_game[count_games_played,j] = elo_start
                 else:
-                    elo_rating_after_game[i,j] = elo_rating_after_game[i-1,j]
+                    elo_rating_after_game[count_games_played,j] = elo_rating_after_game[count_games_played-1,j]
+
+        count_games_played = count_games_played + 1
 
     # Now calculate Win/Loss/Draw expectancy for all games based on actual ELO (after last played game)
     # Expand input_data[1]
     input_data[1] = np.c_[input_data[1], np.zeros((total_games, 3))]  # 3 extra input_data columns (prob home win, prob tie, prob away win)
     for i in range(total_games):
         # Home Team new ELO rating after game
-        W_home_e = 1/(10**(-(elo_rating_after_game[games_played-1,input_data[1][i,0]]+home_field_advantage-elo_rating_after_game[games_played-1,input_data[1][i,1]])/400)+1)
+        W_home_e = 1/(10**(-(elo_rating_after_game[count_games_played-1,input_data[1][i,0]]+home_field_advantage-elo_rating_after_game[count_games_played-1,input_data[1][i,1]])/400)+1)
 
         # First estimate expected goals
         # Goals for Home team

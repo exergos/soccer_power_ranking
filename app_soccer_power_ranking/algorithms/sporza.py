@@ -142,6 +142,22 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
         new_upcoming_games = []
 
         if i == 0 and algorithm == "update": # Update latest season only
+            # Check to see if there are doubles:
+            del_elements_index = []
+            for j in range(len(input_data[i])):
+                for k in range(len(input_data[i])):
+                    if j is not k:
+                        if input_data[i][j]["game_date"] == input_data[i][k]["game_date"] and input_data[i][j]["host"] == input_data[i][k]["host"]:
+                            if input_data[i][j]["played"] == "0":
+                                del_elements_index.append(j)
+                            if input_data[i][k]["played"] == "0":
+                                del_elements_index.append(k)
+            del_elements_index = list(set(del_elements_index))
+            for j in del_elements_index:
+                del output[i][j]
+                del input_data[i][j]
+
+
             for j in range(len(games_upcoming_soup)): # range(len(games))
                 game_date = games_upcoming_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[0]
                 host = games_upcoming_soup[j].find_all("dt")[0].get_text().replace('\n','')
@@ -160,17 +176,18 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
             output.append(list())
 
         count_upcoming_games = 0
+        output_start_length = len(output[i])
         for j in new_upcoming_games:
-            output[i].append(list())
             # Save all categories in dict
             if algorithm == "new":
                 output_index = count_upcoming_games
             else:
                 if i == 0:
-                    output_index = len(input_data[i])+count_upcoming_games
+                    output_index = output_start_length + count_upcoming_games
                 else:
                     output_index = count_upcoming_games
 
+            output[i].append(list())
             output[i][output_index] = dict()
 
             # Add data for new game
@@ -218,17 +235,18 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
 
         #  For game j
         count_games = 0
+        output_start_length = len(output[i])
         for j in new_games: # range(len(games))
-            output[i].append(list())
             # Save all categories in dict
             if algorithm == "new":
                 output_index = count_upcoming_games + count_games
             else:
                 if i == 0:
-                    output_index = len(input_data[i])+ count_upcoming_games + count_games
+                    output_index = output_start_length + count_upcoming_games + count_games
                 else:
                     output_index = count_upcoming_games + count_games
 
+            output[i].append(list())
             output[i][output_index] = dict()
 
             # Add data for new game
