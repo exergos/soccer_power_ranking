@@ -35,7 +35,7 @@ __project__ = 'SPI_JupilerProLeague'
 
 def montecarlo(data, simulations, actual = 0):
     # Argument actual is defined in function definition so it is optional when calling the function
-
+    simulations_po = 100
     import numpy as np
     import time
     # data
@@ -72,7 +72,7 @@ def montecarlo(data, simulations, actual = 0):
         simulation += 1
     sim_end = time.time()
 
-    print('Regular Season Montecarlo Simulation finished in', round(sim_end - sim_start,0), 'seconds')
+    print('Regular Season Montecarlo Simulation finished in', round(sim_end - sim_start,0), 'seconds, taking ' + str(simulations) + ' simulations')
 
     # Adjust simulation_matrix for games already played (only if "actual" parameter = 1)!!
     # 0 for Home Win, 1 for Tie, 2 for Away Win
@@ -135,34 +135,33 @@ def montecarlo(data, simulations, actual = 0):
                     league_ranking[j,i],league_ranking[j-1,i] = league_ranking[j-1,i],league_ranking[j,i]
 
         # 3. Goal difference
-        
         ################################################################################################################
         # Playoff 1
         ################################################################################################################
         po1_rank = list(range(6))
         po1_games = np.zeros((6*(6-1),data[1].shape[1]))
-        simulation_matrix_po1 = np.zeros((6*(6-1),simulations))
-        points_po1 = np.zeros((6, simulations))
-        wins_po1 = np.zeros((6, simulations))
+        simulation_matrix_po1 = np.zeros((6*(6-1),simulations_po))
+        points_po1 = np.zeros((6, simulations_po))
+        wins_po1 = np.zeros((6, simulations_po))
         count_game = 0
         for j in range(6):
             # Take points and wins from regular season
             # Points divided by 2 and ceiled (playoff 1 rules)
-            points_po1[j,:] = np.ceil(points[league_ranking[j,i],i]/2) * np.ones((1, simulations))
-            wins_po1[j,:] = wins[league_ranking[j,i],i] * np.ones((1, simulations))
+            points_po1[j,:] = np.ceil(points[league_ranking[j,i],i]/2) * np.ones((1, simulations_po))
+            wins_po1[j,:] = wins[league_ranking[j,i],i] * np.ones((1, simulations_po))
             for l in range(6):
                 if j is not l:
                     for k in range(len(data[1])):
                         if data[1][k,0] == league_ranking[j,i] and data[1][k,1] == league_ranking[l,i]:
                             po1_games[count_game,:] = data[1][k,:]
                             # No new monte carlo, too computationally expensive
-                            simulation_matrix_po1[count_game,:] = simulation_matrix[k,:]
+                            simulation_matrix_po1[count_game,:] = simulation_matrix[k,0:simulations_po]
                             count_game += 1
 
         # league_ranking is matrix of size number_of_teams x simulation
         # sorted (descending) index of team on that position
-        league_ranking_po1 = np.zeros((6, simulations))
-        for sim in range(simulations):
+        league_ranking_po1 = np.zeros((6, simulations_po))
+        for sim in range(simulations_po):
             for j in range(len(po1_games)):
                 for k in range(6):
                     if po1_games[j, 0] == league_ranking[po1_rank[k],i]:  # Home Team
@@ -219,12 +218,12 @@ def montecarlo(data, simulations, actual = 0):
 
         po2a_games = np.zeros((4*(4-1),data[1].shape[1]))
         po2b_games = np.zeros((4*(4-1),data[1].shape[1]))
-        simulation_matrix_po2a = np.zeros((4*(4-1),simulations))
-        simulation_matrix_po2b = np.zeros((4*(4-1),simulations))
-        points_po2a = np.zeros((4, simulations)) # Start from 0
-        points_po2b = np.zeros((4, simulations)) # Start from 0
-        wins_po2a = np.zeros((4, simulations))
-        wins_po2b = np.zeros((4, simulations))
+        simulation_matrix_po2a = np.zeros((4*(4-1),simulations_po))
+        simulation_matrix_po2b = np.zeros((4*(4-1),simulations_po))
+        points_po2a = np.zeros((4, simulations_po)) # Start from 0
+        points_po2b = np.zeros((4, simulations_po)) # Start from 0
+        wins_po2a = np.zeros((4, simulations_po))
+        wins_po2b = np.zeros((4, simulations_po))
         
         count_game = 0
         for j in po2a_rank:
@@ -234,7 +233,7 @@ def montecarlo(data, simulations, actual = 0):
                         if data[1][k,0] == league_ranking[j,i] and data[1][k,1] == league_ranking[l,i]:
                             po2a_games[count_game,:] = data[1][k,:]
                             # No new monte carlo, too computationally expensive
-                            simulation_matrix_po2a[count_game,:] = simulation_matrix[k,:]
+                            simulation_matrix_po2a[count_game,:] = simulation_matrix[k,0:simulations_po]
                             count_game += 1
                             
         count_game = 0
@@ -245,15 +244,15 @@ def montecarlo(data, simulations, actual = 0):
                         if data[1][k,0] == league_ranking[j,i] and data[1][k,1] == league_ranking[l,i]:
                             po2b_games[count_game,:] = data[1][k,:]
                             # No new monte carlo, too computationally expensive
-                            simulation_matrix_po2b[count_game,:] = simulation_matrix[k,:]
+                            simulation_matrix_po2b[count_game,:] = simulation_matrix[k,0:simulations_po]
                             count_game += 1
 
         # league_ranking is matrix of size number_of_teams x simulation
         # sorted (descending) index of team on that position
-        league_ranking_po2a = np.zeros((4, simulations))
-        league_ranking_po2b = np.zeros((4, simulations))
-        league_ranking_po2 = np.zeros((8,simulations))
-        for sim in range(simulations):
+        league_ranking_po2a = np.zeros((4, simulations_po))
+        league_ranking_po2b = np.zeros((4, simulations_po))
+        league_ranking_po2 = np.zeros((8,simulations_po))
+        for sim in range(simulations_po):
             for j in range(len(po2a_games)):
                 for k in range(4):
                     if po2a_games[j, 0] == league_ranking[po2a_rank[k],i]:  # Home Team
@@ -365,10 +364,10 @@ def montecarlo(data, simulations, actual = 0):
         po3_rank = [14,15] # Finished 15, 16
 
         po3_games = np.zeros((5,data[1].shape[1]))
-        simulation_matrix_po3 = np.zeros((5,simulations))
-        points_po3 = np.zeros((2, simulations))
-        points_po3[0,:] = 3*np.ones((1, simulations)) # Playoff 3 rule
-        wins_po3 = np.zeros((2, simulations))
+        simulation_matrix_po3 = np.zeros((5,simulations_po))
+        points_po3 = np.zeros((2, simulations_po))
+        points_po3[0,:] = 3*np.ones((1, simulations_po)) # Playoff 3 rule
+        wins_po3 = np.zeros((2, simulations_po))
 
         count_game = 0
         for j in po3_rank:
@@ -378,7 +377,7 @@ def montecarlo(data, simulations, actual = 0):
                         if data[1][k,0] == league_ranking[j,i] and data[1][k,1] == league_ranking[l,i]:
                             po3_games[count_game,:] = data[1][k,:]
                             # No new monte carlo, too computationally expensive
-                            simulation_matrix_po3[count_game,:] = simulation_matrix[k,:]
+                            simulation_matrix_po3[count_game,:] = simulation_matrix[k,0:simulations_po]
                             count_game += 1
 
         # Expand to 5 games
@@ -390,8 +389,8 @@ def montecarlo(data, simulations, actual = 0):
         simulation_matrix_po3[4,:] = simulation_matrix_po3[0,:]
         # league_ranking is matrix of size number_of_teams x simulation
         # sorted (descending) index of team on that position
-        league_ranking_po3 = np.zeros((2, simulations))
-        for sim in range(simulations):
+        league_ranking_po3 = np.zeros((2, simulations_po))
+        for sim in range(simulations_po):
             for j in range(len(po3_games)):
                 for k in range(2):
                     if po3_games[j, 0] == league_ranking[po3_rank[k],i]:  # Home Team
@@ -444,13 +443,15 @@ def montecarlo(data, simulations, actual = 0):
                     league_ranking_distribution_po[i][league_ranking[j,i], possible_positions_j[k]] = amount_per_position_j[k]
 
         sim_stop_lr = time.time()
-        print('LR '+ str(i) , round(sim_stop_lr - sim_start_lr,1), 'seconds')
+        if i == 0:
+            print('One LR iteration takes', round(sim_stop_lr - sim_start_lr,1), 'seconds')
+            print('Total LR time is appr.', simulations*round(sim_stop_lr - sim_start_lr,1), 'seconds')
 
 
     league_ranking_distribution_po_final = np.zeros((number_of_teams,number_of_teams))
     for i in range(len(league_ranking_distribution_po)):
         league_ranking_distribution_po_final += league_ranking_distribution_po[i]
-    league_ranking_distribution_po_final = league_ranking_distribution_po_final/(simulations*simulations)
+    league_ranking_distribution_po_final = league_ranking_distribution_po_final/(simulations_po*simulations_po)
 
     sim_end = time.time()
     print('Regular Season League Ranking Distribution finished in', round(sim_end - sim_start,0),'seconds')

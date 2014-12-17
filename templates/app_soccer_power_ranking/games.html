@@ -19,6 +19,7 @@
         {#On document ready, load stuff#}
         $(document).ready(function()
                 {
+                    $("#game").tablesorter();
                     $("#games").tablesorter();
 
                     $('#loading').remove();
@@ -36,27 +37,47 @@
 {#</script>#}
 
 {#SPI Table#}
-<table cellspacing='0' id="games" class="tablesorter">
+<table cellspacing='0' id="game" class="tablesorter">
     {#    Make table headers#}
+
+    <thead>
+    <tr>
+        {% for header in game_headers %}
+            <th>{{ header }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    {#    Fill rest of table with data#}
+    <tbody>
+
+        <tr>
+            {% for value in game_values %}
+                    <td>{{ value }}</td>
+            {% endfor %}
+        </tr>
+
+    </tbody>
+</table>
+
+<table cellspacing='0' id="games" class="tablesorter">
+{#        //Make table headers#}
 
     <thead>
     <tr>
         {% for header in games_headers %}
             <th>{{ header }}</th>
         {% endfor %}
-        <th>PROJ</th>
     </tr>
     </thead>
-    {#    Fill rest of table with data#}
+{#        Fill rest of table with data#}
     <tbody>
-    {% for values in games_values %}
+        {% for values in games_values %}
         <tr>
             {% for value in values %}
                     <td>{{ value }}</td>
             {% endfor %}
         </tr>
-    {% endfor %}
-
+        {% endfor %}
     </tbody>
 </table>
 

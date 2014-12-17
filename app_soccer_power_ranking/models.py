@@ -36,6 +36,21 @@ for i in range(16):
 for i in range(5):
     elo_data.add_to_class('elo_min%s' % i, models.DecimalField(max_digits= 30, decimal_places= 15,default=0))
 
+class elo_data_po(models.Model):
+    # Field 1: Team Name
+    team = models.TextField(default='')
+
+    # To loop through field names and field values in template
+    def get_fields(self):
+        return [(field.name, field.value_to_string(self)) for field in elo_data_po._meta.fields]
+
+# Other fields: possible league finishes (1 to 16)
+for i in range(16):
+    elo_data_po.add_to_class('finish_%s' % (i+1), models.DecimalField(max_digits= 30, decimal_places= 15,default=0))
+
+
+
+
 class standings(models.Model):
     # To loop through field names and field values in template
     def get_fields(self):
@@ -58,6 +73,7 @@ class standings(models.Model):
         return [(field.name, field.value_to_string(self)) for field in elo_data._meta.fields]
 
 class game_data(models.Model):
+    import datetime
     # To loop through field names and field values in template
     def get_fields(self):
         return [(field.name, field.value_to_string(self)) for field in game_data._meta.fields]
@@ -88,7 +104,7 @@ class game_data(models.Model):
     #                           output[season][game]["host_manager"]
     #                           output[season][game]["visitor_manager"]
     #                           output[season][game]["minute_x"] with x from 1 tot 90
-    game_date = models.TextField(default='')
+    game_date = models.DateField() # ["%d/%m/%Y"], default=datetime.now().strftime("%d/%m/%Y")
     game_hour = models.TextField(default='')
     host = models.TextField(default='')
     visitor = models.TextField(default='')

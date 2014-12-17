@@ -69,7 +69,7 @@ def game_to_team(input_data):
     import time
     dates = []
     for i in range(total_games):
-        dates.append(time.strptime(input_data[0][i]["game_date"],"%d/%m/%Y"))
+        dates.append(input_data[0][i]["game_date"])
 
     dates_sort_index = [i[0] for i in sorted(enumerate(dates), key=lambda x:x[1])]
 

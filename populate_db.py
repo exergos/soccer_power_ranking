@@ -10,7 +10,7 @@ def populate():
 
     # # # # Load sporza data
     # from app_soccer_power_ranking.algorithms.sporza import sporza
-    # input_data = sporza("update",number_of_seasons=1)
+    # input_data = sporza("new",number_of_seasons=8)
 
     # Or get it from file:
     # Import previous file
@@ -37,7 +37,7 @@ def populate():
 
     # Generate SPI data
     import app_soccer_power_ranking.algorithms.SPI_algorithm as spi
-    output_spi = spi.spi(input_data)
+    output_spi = spi.spi(input_data,simulations=1000)
 
     # output_spi is a list of 2 things
     # [0]:  List of 2 things
@@ -64,10 +64,11 @@ def populate():
     # ELO
     # Remove previous data
     elo_data.objects.all().delete()
+    elo_data_po.objects.all().delete()
 
     # Generate ELO data
     import app_soccer_power_ranking.algorithms.ELO_algorithm as elo
-    output_elo = elo.elo(input_data)
+    output_elo = elo.elo(input_data,simulations=1000)
     #
     # # output_elo is a list of 2 things
     # # [0]:  List of 2 things
@@ -84,14 +85,16 @@ def populate():
 
         # d is dictionary of field names and values
         d_elo = {'team' : output_elo[0][0][0][i],'elo' : output_elo[0][0][1][i]}
+        d_elo_po = {'team' : output_elo[0][0][0][i]}
         for j in range(16):
             d_elo['finish_%s' % (j+1)] = output_elo[0][1][i,j]
+            d_elo_po['finish_%s' % (j+1)] = output_elo[0][2][i,j]
 
         for j in range(5):
             d_elo['elo_min%s' % j] = output_elo[2][i][-1-j]
 
         elo_data.objects.create(**d_elo)
-
+        elo_data_po.objects.create(**d_elo_po)
     # Game Data
     # Remove previous data
     game_data.objects.all().delete()
@@ -119,6 +122,7 @@ if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_soccer_power_ranking.settings')
     from app_soccer_power_ranking.models import spi_data
     from app_soccer_power_ranking.models import elo_data
+    from app_soccer_power_ranking.models import elo_data_po
     from app_soccer_power_ranking.models import standings
     from app_soccer_power_ranking.models import game_data
 

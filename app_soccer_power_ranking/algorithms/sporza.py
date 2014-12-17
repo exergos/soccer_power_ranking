@@ -77,6 +77,7 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
     print("Starting scrape of sporza.be")
     # Time algorithm
     import time
+    import datetime
 
     # Scraping tools
     from bs4 import BeautifulSoup
@@ -192,7 +193,7 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
 
             # Add data for new game
             # Game Date
-            output[i][output_index]["game_date"] = games_upcoming_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[0]
+            output[i][output_index]["game_date"] = datetime.datetime.strptime(games_upcoming_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[0],"%d/%m/%Y")
 
             # Host
             output[i][output_index]["host"] = games_upcoming_soup[j].find_all("dt")[0].get_text().replace('\n','')
@@ -215,7 +216,7 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
 
         if i == 0 and algorithm == "update": # Update latest season only
             for j in range(len(games_soup)): # range(len(games))
-                game_date = games_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[0]
+                game_date = datetime.datetime.strptime(games_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[0],"%d/%m/%Y")
                 host = games_soup[j].find_all("dt")[0].get_text().replace('\n','')
 
                 match = 0
@@ -251,7 +252,7 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
 
             # Add data for new game
             # Game Date
-            output[i][output_index]["game_date"] = games_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[0]
+            output[i][output_index]["game_date"] = datetime.datetime.strptime(games_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[0],"%d/%m/%Y")
 
             # Game hour
             output[i][output_index]["game_hour"] = games_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[1]

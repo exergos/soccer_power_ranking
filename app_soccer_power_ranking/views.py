@@ -6,9 +6,9 @@ from django.shortcuts import render
 # Import models to use in website (database - site connection)
 from app_soccer_power_ranking.models import spi_data
 from app_soccer_power_ranking.models import elo_data
+from app_soccer_power_ranking.models import elo_data_po
 from app_soccer_power_ranking.models import game_data
 from app_soccer_power_ranking.models import standings
-
 
 # To make list of lists that are not copies of each other
 from itertools import repeat
@@ -47,6 +47,7 @@ def team_table(request):
 
     team_finish_spi = spi_data.objects.all()
     team_finish_elo = elo_data.objects.all()
+    team_finish_elo_po = elo_data_po.objects.all()
 
     # First make table for SPI, off_rating and def_rating
     # Get fields in a list SPI_headers
@@ -105,6 +106,18 @@ def team_table(request):
                     elo_chart[team][16-league_positions].append(name.strip("finish_"))
                     elo_chart[team][16-league_positions].append(decimal.Decimal(value))
 
+    elo_chart_po = [[[] for i in repeat(None, 17)] for j in repeat(None, 16)]
+
+    for team in range(len(team_finish_elo_po)):
+        elo_chart_po[team][0].append("finish")
+        for name, value in team_finish_elo_po[team].get_fields():
+            if name == "team":
+                elo_chart_po[team][0].append(value)
+            for league_positions in range(16):
+                if name == "finish_" + str(league_positions+1):
+                    elo_chart_po[team][16-league_positions].append(name.strip("finish_"))
+                    elo_chart_po[team][16-league_positions].append(decimal.Decimal(value))
+                    
     # Django to Javascript gives problems
     # Therefore, convert using jsonEncoder!
     # Do this for every team separate, otherwise problems!
@@ -114,61 +127,96 @@ def team_table(request):
     for team in range(len(elo_chart)):
         elo_chart[team] = json.dumps(elo_chart[team], cls=DecimalEncoder)
 
-    context_dict = {'table_headers' : table_headers,'table_values' : table_values, 'elo_chart': elo_chart}
+    for team in range(len(elo_chart_po)):
+        elo_chart_po[team] = json.dumps(elo_chart_po[team], cls=DecimalEncoder)
+
+    context_dict = {'table_headers' : table_headers,'table_values' : table_values, 'elo_chart': elo_chart, 'elo_chart_po': elo_chart_po}
 
     return render(request, 'app_soccer_power_ranking/ranking.html', context_dict)
 
 def game_table(request):
+    import datetime
     # Standard Ranking
-    games = game_data.objects.all()
-    games_headers = list(games.values()[0].keys())
-    games_values = list()
-    for i in range(5): # len(games)
-        games_values.append(list(games.values()[i].values()))
+    # Select Game
+    game = game_data.objects.filter(id="10768")
 
-    context_dict = {'games_headers' : games_headers,'games_values' : games_values}
+    game_headers = ["Date","Host", "Visitor", "Host Win %", "Tie %", "Visitor Win %"]
+    game_values = list()
+    game_values.append(game.values()[0]["game_date"])
+    game_values.append(game.values()[0]["host"])
+    game_values.append(game.values()[0]["visitor"])
+    game_values.append(str(round(100*game.values()[0]["host_elo"],0)) + "%")
+    game_values.append(str(round(100*game.values()[0]["tie_elo"],0)) + "%")
+    game_values.append(str(round(100*game.values()[0]["visitor_elo"],0)) + "%")
+
+    if game.values()[0]["played"] == "1":
+        game_headers.append("Host Goals")
+        game_headers.append("Visitor Goals")
+        game_headers.append("Upset")
+        game_headers.append("Excitement")
+
+        game_values.append(str(game.values()[0]["host_goal"]))
+        game_values.append(str(game.values()[0]["visitor_goal"]))
+        game_values.append(str(round(100*game.values()[0]["upset"],0))+"%")
+        game_values.append(str(round(100*game.values()[0]["excitement"],0))+"%")
+
+
+    # All games played in last season
+    games = game_data.objects.filter(game_date__gte = datetime.datetime(2014,7,1)).filter(game_date__lte = datetime.datetime.now())
+    games_headers = ["Date","Host", "Visitor", "Host Win %", "Tie %", "Visitor Win %","Host Goals","Visitor Goals","Upset","Excitement"]
+
+    games_values = list()
+    for i in range(len(games)): # len(games)
+        games_values.append(list())
+        dummy = games.values()[i]
+        games_values[i].append(dummy["game_date"]) # datetime.datetime.strftime(,"%d/%m/%Y")
+        games_values[i].append(dummy["host"])
+        games_values[i].append(dummy["visitor"])
+        games_values[i].append(str(round(100*dummy["host_elo"],0)) + "%")
+        games_values[i].append(str(round(100*dummy["tie_elo"],0)) + "%")
+        games_values[i].append(str(round(100*dummy["visitor_elo"],0)) + "%")
+        games_values[i].append(str(dummy["host_goal"]))
+        games_values[i].append(str(dummy["visitor_goal"]))
+        games_values[i].append(str(round(100*dummy["upset"],0))+"%")
+        games_values[i].append(str(round(100*dummy["excitement"],0))+"%")
+
+
+    context_dict = {'game_headers' : game_headers,'game_values' : game_values, 'games_headers' : games_headers, 'games_values' : games_values}
 
     return render(request, 'app_soccer_power_ranking/games.html', context_dict)
 
 
 
-def chart(request):
-    return(request, 'app_soccer_power_ranking/chart.html')
-
 # def chart(request):
-#     # Select Game
-#     game = game_data.objects.filter(id="2450")
-#     # if int(game.values("host_goal")[0].get("host_goal")) > int(game.values("visitor_goal")[0].get("visitor_goal")):
-#     #     end_result = 1
-#     # else:
-#     #     if int(game.values("host_goal")[0].get("host_goal")) == int(game.values("visitor_goal")[0].get("visitor_goal")):
-#     #         end_result = 0
-#     #     else:
-#     #         end_result = -1
-#
-#     # Game Chance chart
-#     # game_chart
-#     minutes = 90
-#     game_chart = [[] for i in repeat(None,minutes)]
-#     game_chart.insert(0,["Minute","Host","Tie","Visitor"])
-#
-#     for i in range(minutes):
-#         delta_par = game.values("minute_" + str(int(i+1)))[0].get("minute_" + str(int(i+1)))
-#         minute_par = i+1
-#         game_chart[i+1].append(str(minute_par))
-#
-#         # Create areachart
-#         host_win = game_situations.objects.filter(minute=str(minute_par),delta=delta_par,result=str(1)).values("chance")[0].get("chance")
-#         tie = game_situations.objects.filter(minute=str(minute_par),delta=delta_par,result=str(0)).values("chance")[0].get("chance")
-#         visitor_win = game_situations.objects.filter(minute=str(minute_par),delta=delta_par,result=str(-1)).values("chance")[0].get("chance")
-#         game_chart[i+1].append(host_win)
-#         game_chart[i+1].append(tie)
-#         game_chart[i+1].append(visitor_win)
-#
-#     # Django to Javascript gives problems
-#     # Therefore, convert using jsonEncoder!
-#     # Do this for every team separate, otherwise problems!
-#     game_chart = json.dumps(game_chart, cls=DecimalEncoder)
-#     context_dict = {'game_chart': game_chart}
-#
-#     return render(request, 'app_soccer_power_ranking/chart.html', context_dict)
+#     return(request, 'app_soccer_power_ranking/chart.html')
+
+def chart(request):
+    # from django.db import connection
+    # cursor = connection.cursor()
+    # cursor.execute("SHOW GLOBAL VARIABLES LIKE 'wait_timeout'")
+    # print cursor.fetchone()
+    # cursor.execute("SET GLOBAL wait_timeout=12345")
+    # cursor.execute("SHOW GLOBAL VARIABLES LIKE 'wait_timeout'")
+    # print cursor.fetchone()
+    # Select Game
+    game = game_data.objects.filter(id="10768")
+    # Game Chance chart
+    # game_chart
+    minutes = 90
+    game_chart = [[] for i in repeat(None,minutes)]
+    game_chart.insert(0,["Minute","Host","Tie","Visitor"])
+
+    for i in range(minutes):
+        game_chart[i+1].append(str(i+1))
+        game_chart[i+1].append(game.values()[0]["minute_" + str(i+1) + "_host"])
+        game_chart[i+1].append(game.values()[0]["minute_" + str(i+1) + "_tie"])
+        game_chart[i+1].append(game.values()[0]["minute_" + str(i+1) + "_visitor"])
+
+
+    # Django to Javascript gives problems
+    # Therefore, convert using jsonEncoder!
+    # Do this for every team separate, otherwise problems!
+    game_chart = json.dumps(game_chart, cls=DecimalEncoder)
+    context_dict = {'game_chart': game_chart}
+
+    return render(request, 'app_soccer_power_ranking/chart.html', context_dict)
