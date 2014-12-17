@@ -4,238 +4,295 @@
 {% load app_soccer_power_ranking_extra_templates %}
 {#This import css file (static)#}
 <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'css/jquery.qtip.min.css' %}" />
 <html>
 <head>
-    {#JQuery for basic tools#}
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    {#Tablesorter to make table sortable via columns#}
-    {#Added locally as a static file#}
-    <script src="{% static "js/tablesorter/jquery-latest.js" %}"></script>
-    <script src="{% static "js/tablesorter/jquery.tablesorter.js" %}"></script>
-    {#Google Charts#}
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    {#Script to load tablesorter, create charts and fill table#}
-    <script type="text/javascript">
-        {#On document ready, load stuff#}
-        $(document).ready(function()
-                {
-                    $("#ranking").tablesorter();
+{#JQuery for basic tools#}
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+{#Tablesorter to make table sortable via columns#}
+{#Added locally as a static file#}
+<script src="{% static "js/tablesorter/jquery.tablesorter.js" %}"></script>
+<script src="{% static "js/jquery.qtip.min.js" %}"></script>
+{#Google Charts#}
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+{#Script to load tablesorter, create charts and fill table#}
 
-                    $('#loading').remove();
+<script type="text/javascript">
+{#On document ready, load stuff#}
+$(document).ready(function()
+{
+    $("#ranking").tablesorter();
+
+
+});
+
+// Add +/- compared to last week to ELO Rating
+number_of_teams = 0;
+{% for elo_history_i in elo_history %}
+    // Define elo_change
+    var elo_history_data = {{ elo_history_i }};
+    var elo_change = parseFloat(elo_history_data[0]) - parseFloat(elo_history_data[1]);
+
+    // Find element where ELO rating is shown
+    $('#ranking').find('tbody').find('tr').eq(number_of_teams).find('td').
+            .last().after('<td>' + google_chart_img_elo.outerHTML + '</td>');
+
+    // Next team
+    number_of_teams = number_of_teams + 1;
+{% endfor %}
+
+google.load("visualization", "1", {packages:["corechart"]});
+google.setOnLoadCallback(drawChart);
+function drawChart() {
+    //Create charts
+    //Customize chart using options
+    //https://developers.google.com/chart/interactive/docs/customizing_axes
+    var options = {
+        vAxis: {
+            gridlines: {
+                color: 'transparent'
+            }
+        },
+        'chartArea': {'width': '100%'},
+        legend: {position: 'none'},
+        hAxis: {title: '', textColor: "#fff" },
+        baselineColor: '#fff',
+        gridlineColor: '#fff',
+        textPosition: 'none',
+        axisFontSize: 0
+
+    };
+
+    {#    var chart_spi = [];#}
+    {#    var number_of_charts_spi = 0;#}
+    {#    {% for spi_chart_i in spi_chart %}#}
+    {#        var djangoData_spi = {{ spi_chart_i |safe }};#}
+    {##}
+    {#        //Add color data to chart#}
+    {#        djangoData_spi[0].push({ role: 'style' });#}
+    {#        for (i = 1; i <= 16; i++) {#}
+    {#            //If i smaller than 12, these are league positions 7-16 (i.e. out of playoffs)#}
+    {#            if (i < 11) {#}
+    {#                if (i < 3) {#}
+    {#                    //Play-off 3#}
+    {#                    djangoData_spi[i].push('red');#}
+    {#                }#}
+    {#                else {#}
+    {#                    //Play-off 2#}
+    {#                    djangoData_spi[i].push('blue');#}
+    {#                }#}
+    {#            }#}
+    {#            else {#}
+    {#                //Play-off 1#}
+    {#                djangoData_spi[i].push('green');#}
+    {#            }#}
+    {#        }#}
+    {#        var data_spi = google.visualization.arrayToDataTable(djangoData_spi);#}
+    {#        var id_name_spi = 'chart_div_spi' + String(number_of_charts_spi);#}
+    {##}
+    {#        // Create div (needed to make chart, later changed to image)#}
+    {#        var div_spi = document.createElement('div');#}
+    {#        div_spi.id = id_name_spi;#}
+    {##}
+    {#        // Create chart object#}
+    {#        chart_spi[number_of_charts_spi] = new google.visualization.ColumnChart(div_spi);#}
+    {##}
+    {#        // Wait for the chart to finish drawing before calling the getImageURI() method.#}
+    {#        // This makes image (PNG) of chart instead of object#}
+    {#        google.visualization.events.addListener(chart_spi[number_of_charts_spi], 'ready', function () {#}
+    {#            div_spi.innerHTML = '<img src="' + chart_spi[number_of_charts_spi].getImageURI() + '">';#}
+    {#            console.log(div_spi.innerHTML);#}
+    {#        });#}
+    {##}
+    {#        // Draw chart command#}
+    {#        chart_spi[number_of_charts_spi].draw(data_spi, options);#}
+    {##}
+    {#        // Inside chart div is the img object#}
+    {#        var google_chart_img_spi = div_spi.children[0];#}
+    {#        google_chart_img_spi.className = "chart";#}
+    {##}
+    {#        // Put it inside td as an extra column in table#}
+    {#        // Use outerHTML to get html string of image#}
+    {#        $('#spi_ranking').find('tbody').find('tr').eq(number_of_charts_spi).find('td').last().after('<td>' + google_chart_img_spi.outerHTML + '</td>');#}
+    {##}
+    {#        // Go to next chart#}
+    {#        number_of_charts_spi = number_of_charts_spi + 1;#}
+    {##}
+    {#    {%  endfor %}#}
+
+    var chart_elo = [];
+    var number_of_charts_elo = 0;
+
+
+    {% for elo_chart_i in elo_chart %}
+        var djangoData_elo = {{ elo_chart_i |safe }};
+        //Add color data to chart
+        djangoData_elo[0].push({ role: 'style' });
+        for (i = 1; i <= 16; i++) {
+            //If i smaller than 12, these are league positions 7-16 (i.e. out of playoffs)
+            if (i < 11) {
+                if (i < 3) {
+                    //Play-off 3
+                    djangoData_elo[i].push('red');
                 }
-        );
-
-        google.load("visualization", "1", {packages:["corechart"]});
-        google.setOnLoadCallback(drawChart);
-        function drawChart() {
-            //Create charts
-            //Customize chart using options
-            //https://developers.google.com/chart/interactive/docs/customizing_axes
-            var options = {
-                vAxis: {
-                    gridlines: {
-                        color: 'transparent'
-                    }
-                },
-                'chartArea': {'width': '100%'},
-                legend: {position: 'none'},
-                hAxis: {title: '', textColor: "#fff" },
-                baselineColor: '#fff',
-                gridlineColor: '#fff',
-                textPosition: 'none',
-                axisFontSize : 0
-
-            };
-
-{#            var chart_spi = [];#}
-{#            var number_of_charts_spi = 0;#}
-{#            {% for spi_chart_i in spi_chart %}#}
-{#                var djangoData_spi = {{ spi_chart_i |safe }};#}
-{##}
-{#                 //Add color data to chart#}
-{#                djangoData_spi[0].push({ role: 'style' });#}
-{#                for (i = 1; i <= 16; i++) {#}
-{#                    //If i smaller than 12, these are league positions 7-16 (i.e. out of playoffs)#}
-{#                    if (i < 11) {#}
-{#                        if (i < 3) {#}
-{#                            //Play-off 3#}
-{#                            djangoData_spi[i].push('red');#}
-{#                        }#}
-{#                        else {#}
-{#                            //Play-off 2#}
-{#                            djangoData_spi[i].push('blue');#}
-{#                        }#}
-{#                    }#}
-{#                    else {#}
-{#                        //Play-off 1#}
-{#                        djangoData_spi[i].push('green');#}
-{#                    }#}
-{#                }#}
-{#                var data_spi = google.visualization.arrayToDataTable(djangoData_spi);#}
-{#                var id_name_spi = 'chart_div_spi' +String(number_of_charts_spi);#}
-{##}
-{#                // Create div (needed to make chart, later changed to image)#}
-{#                var div_spi = document.createElement('div');#}
-{#                div_spi.id = id_name_spi;#}
-{##}
-{#                // Create chart object#}
-{#                chart_spi[number_of_charts_spi] = new google.visualization.ColumnChart(div_spi);#}
-{##}
-{#                // Wait for the chart to finish drawing before calling the getImageURI() method.#}
-{#                // This makes image (PNG) of chart instead of object#}
-{#                google.visualization.events.addListener(chart_spi[number_of_charts_spi], 'ready', function () {#}
-{#                    div_spi.innerHTML = '<img src="' + chart_spi[number_of_charts_spi].getImageURI() + '">';#}
-{#                    console.log(div_spi.innerHTML);#}
-{#                });#}
-{##}
-{#                // Draw chart command#}
-{#                chart_spi[number_of_charts_spi].draw(data_spi, options);#}
-{##}
-{#                // Inside chart div is the img object#}
-{#                var google_chart_img_spi = div_spi.children[0];#}
-{#                google_chart_img_spi.className = "chart";#}
-{##}
-{#                // Put it inside td as an extra column in table#}
-{#                // Use outerHTML to get html string of image#}
-{#                $('#spi_ranking').find('tbody').find('tr').eq(number_of_charts_spi).find('td').last().after('<td>' + google_chart_img_spi.outerHTML + '</td>');#}
-{##}
-{#                // Go to next chart#}
-{#                number_of_charts_spi = number_of_charts_spi + 1;#}
-{##}
-{#            {%  endfor %}#}
-
-            var chart_elo = [];
-            var number_of_charts_elo = 0;
-
-
-            {% for elo_chart_i in elo_chart %}
-                var djangoData_elo = {{ elo_chart_i |safe }};
-                //Add color data to chart
-                djangoData_elo[0].push({ role: 'style' });
-                for (i = 1; i <= 16; i++) {
-                    //If i smaller than 12, these are league positions 7-16 (i.e. out of playoffs)
-                    if (i < 11) {
-                        if (i < 3) {
-                            //Play-off 3
-                            djangoData_elo[i].push('red');
-                        }
-                        else {
-                            //Play-off 2
-                            djangoData_elo[i].push('blue');
-                        }
-                    }
-                    else {
-                        //Play-off 1
-                        djangoData_elo[i].push('green');
-                    }
+                else {
+                    //Play-off 2
+                    djangoData_elo[i].push('blue');
                 }
-
-                var data_elo = google.visualization.arrayToDataTable(djangoData_elo);
-                var id_name_elo = 'chart_div_elo' +String(number_of_charts_elo);
-
-                // Create div (needed to make chart, later changed to image)
-                var div_elo = document.createElement('div');
-                div_elo.id = id_name_elo;
-
-                // Create chart object
-                chart_elo[number_of_charts_elo] = new google.visualization.ColumnChart(div_elo);
-
-                // Wait for the chart to finish drawing before calling the getImageURI() method.
-                // This makes image (PNG) of chart instead of object
-                google.visualization.events.addListener(chart_elo[number_of_charts_elo], 'ready', function () {
-                    div_elo.innerHTML = '<img src="' + chart_elo[number_of_charts_elo].getImageURI() + '">';
-                    console.log(div_elo.innerHTML);
-                });
-
-                // Draw chart command
-                chart_elo[number_of_charts_elo].draw(data_elo, options);
-
-                // Inside chart div is the img object
-                var google_chart_img_elo = div_elo.children[0];
-                google_chart_img_elo.className = "chart";
-
-                // Put it inside td as an extra column in table
-                // Use outerHTML to get html string of image
-                $('#ranking').find('tbody').find('tr').eq(number_of_charts_elo).find('td').last().after('<td>' + google_chart_img_elo.outerHTML + '</td>');
-
-                // Go to next chart
-                number_of_charts_elo = number_of_charts_elo + 1;
-
-            {%  endfor %}
-
-
-
-        var chart_elo_po = [];
-            var number_of_charts_elo_po = 0;
-
-
-            {% for elo_chart_i in elo_chart_po %}
-                var djangoData_elo_po = {{ elo_chart_i |safe }};
-                //Add color data to chart
-                djangoData_elo_po[0].push({ role: 'style' });
-                for (i = 1; i <= 16; i++) {
-                    //If i smaller than 12, these are league positions 7-16 (i.e. out of playoffs)
-                    if (i < 11) {
-                        if (i < 3) {
-                            //Play-off 3
-                            djangoData_elo_po[i].push('red');
-                        }
-                        else {
-                            //Play-off 2
-                            djangoData_elo_po[i].push('blue');
-                        }
-                    }
-                    else {
-                        //Play-off 1
-                        djangoData_elo_po[i].push('green');
-                    }
-                }
-
-                var data_elo_po = google.visualization.arrayToDataTable(djangoData_elo_po);
-                var id_name_elo_po = 'chart_div_elo' +String(number_of_charts_elo_po);
-
-                // Create div (needed to make chart, later changed to image)
-                var div_elo_po = document.createElement('div');
-                div_elo_po.id = id_name_elo_po;
-
-                // Create chart object
-                chart_elo_po[number_of_charts_elo_po] = new google.visualization.ColumnChart(div_elo_po);
-
-                // Wait for the chart to finish drawing before calling the getImageURI() method.
-                // This makes image (PNG) of chart instead of object
-                google.visualization.events.addListener(chart_elo_po[number_of_charts_elo_po], 'ready', function () {
-                    div_elo_po.innerHTML = '<img src="' + chart_elo_po[number_of_charts_elo_po].getImageURI() + '">';
-                    console.log(div_elo_po.innerHTML);
-                });
-
-                // Draw chart command
-                chart_elo_po[number_of_charts_elo_po].draw(data_elo_po, options);
-
-                // Inside chart div is the img object
-                var google_chart_img_elo_po = div_elo_po.children[0];
-                google_chart_img_elo_po.className = "chart";
-
-                // Put it inside td as an extra column in table
-                // Use outerHTML to get html string of image
-                $('#ranking').find('tbody').find('tr').eq(number_of_charts_elo_po).find('td').last().after('<td>' + google_chart_img_elo_po.outerHTML + '</td>');
-
-                // Go to next chart
-                number_of_charts_elo_po = number_of_charts_elo_po + 1;
-
-            {%  endfor %}
+            }
+            else {
+                //Play-off 1
+                djangoData_elo[i].push('green');
+            }
         }
-    </script>
+
+
+
+
+
+        var data_elo = google.visualization.arrayToDataTable(djangoData_elo);
+        var id_name_elo = 'chart_div_elo' + String(number_of_charts_elo);
+
+        // Create div (needed to make chart, later changed to image)
+        var div_elo = document.createElement('div');
+        div_elo.id = id_name_elo;
+
+        // Create chart object
+        chart_elo[number_of_charts_elo] = new google.visualization.ColumnChart(div_elo);
+
+        // Wait for the chart to finish drawing before calling the getImageURI() method.
+        // This makes image (PNG) of chart instead of object
+        google.visualization.events.addListener(chart_elo[number_of_charts_elo], 'ready', function () {
+            div_elo.innerHTML = '<img src="' + chart_elo[number_of_charts_elo].getImageURI() + '">';
+            console.log(div_elo.innerHTML);
+        });
+
+        // Draw chart command
+        chart_elo[number_of_charts_elo].draw(data_elo, options);
+
+        // Inside chart div is the img object
+        var google_chart_img_elo = div_elo.children[0];
+        google_chart_img_elo.className = "chart";
+        google_chart_img_elo.id = "chart_elo" + String(number_of_charts_elo);
+
+        // Put it inside td as an extra column in table
+        // Use outerHTML to get html string of image
+        $('#ranking').find('tbody').find('tr').eq(number_of_charts_elo).find('td').last().after('<td>' + google_chart_img_elo.outerHTML + '</td>');
+
+        var positions = 0;
+        var text_tooltip = '';
+        for (i = 16; i >= 1; i--) {
+            text_tooltip = text_tooltip + djangoData_elo[i][0] + ": " + String(Math.round(100*parseFloat(djangoData_elo[i][1]))) + "%" + "<br>";
+            positions = positions + 1;
+        }
+
+        // Add tooltip using qtip2
+        $('#' + google_chart_img_elo.id).qtip({
+            position: {
+                target: 'mouse', // Track the mouse as the positioning target
+                adjust: { x: 5, y: 5 } // Offset it slightly from under the mouse
+            },
+            content: {
+                title: 'Projected Regular Season Finish',
+                text: text_tooltip
+            }
+        });
+
+        // Go to next chart
+        number_of_charts_elo = number_of_charts_elo + 1;
+
+    {%  endfor %}
+
+
+
+    var chart_elo_po = [];
+    var number_of_charts_elo_po = 0;
+
+
+    {% for elo_chart_i in elo_chart_po %}
+        var djangoData_elo_po = {{ elo_chart_i |safe }};
+        //Add color data to chart
+        djangoData_elo_po[0].push({ role: 'style' });
+        for (i = 1; i <= 16; i++) {
+            //If i smaller than 12, these are league positions 7-16 (i.e. out of playoffs)
+            if (i < 11) {
+                if (i < 3) {
+                    //Play-off 3
+                    djangoData_elo_po[i].push('red');
+                }
+                else {
+                    //Play-off 2
+                    djangoData_elo_po[i].push('blue');
+                }
+            }
+            else {
+                //Play-off 1
+                djangoData_elo_po[i].push('green');
+            }
+        }
+
+        var data_elo_po = google.visualization.arrayToDataTable(djangoData_elo_po);
+        var id_name_elo_po = 'chart_div_elo' + String(number_of_charts_elo_po);
+
+        // Create div (needed to make chart, later changed to image)
+        var div_elo_po = document.createElement('div');
+        div_elo_po.id = id_name_elo_po;
+
+        // Create chart object
+        chart_elo_po[number_of_charts_elo_po] = new google.visualization.ColumnChart(div_elo_po);
+
+        // Wait for the chart to finish drawing before calling the getImageURI() method.
+        // This makes image (PNG) of chart instead of object
+        google.visualization.events.addListener(chart_elo_po[number_of_charts_elo_po], 'ready', function () {
+            div_elo_po.innerHTML = '<img src="' + chart_elo_po[number_of_charts_elo_po].getImageURI() + '">';
+            console.log(div_elo_po.innerHTML);
+        });
+
+        // Draw chart command
+        chart_elo_po[number_of_charts_elo_po].draw(data_elo_po, options);
+
+        // Inside chart div is the img object
+        var google_chart_img_elo_po = div_elo_po.children[0];
+        google_chart_img_elo_po.className = "chart";
+        google_chart_img_elo_po.id = 'chart_elo_po' + String(number_of_charts_elo_po)
+
+        // Put it inside td as an extra column in table
+        // Use outerHTML to get html string of image
+        $('#ranking').find('tbody').find('tr').eq(number_of_charts_elo_po).find('td').last().after('<td>' + google_chart_img_elo_po.outerHTML + '</td>');
+
+        var positions = 0;
+        var text_tooltip = '';
+        for (i = 16; i >= 1; i--) {
+            text_tooltip = text_tooltip + djangoData_elo_po[i][0] + ": " + String(Math.round(100*parseFloat(djangoData_elo_po[i][1]))) + "%" + "<br>";
+            positions = positions + 1;
+        }
+
+
+        // Add tooltip using qtip2
+        $('#' + google_chart_img_elo_po.id).qtip({
+            position: {
+                target: 'mouse', // Track the mouse as the positioning target
+                adjust: { x: 5, y: 5 } // Offset it slightly from under the mouse
+            },
+            content: {
+                title: 'Projected Play-off Finish',
+                text: text_tooltip
+            }
+        });
+
+        // Go to next chart
+        number_of_charts_elo_po = number_of_charts_elo_po + 1;
+
+    {%  endfor %}
+};
+</script>
 </head>
 <body>
-{#Load data#}
 
-{#<script>#}
-{#document.write("<p id='loading'>Loading...</p>");#}
-{#</script>#}
+{#Ranking Table#}
 
-{#SPI Table#}
 <table cellspacing='0' id="ranking" class="tablesorter">
-    {#    Make table headers#}
+    {#        Make table headers#}
     <thead>
     <tr>
         {% for header in table_headers %}
@@ -245,7 +302,7 @@
         <th>PROJ PO</th>
     </tr>
     </thead>
-    {#    Fill rest of table with data#}
+    {#        Fill rest of table with data#}
     <tbody>
     {% for values in table_values %}
         <tr>

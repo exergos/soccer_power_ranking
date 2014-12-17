@@ -130,7 +130,19 @@ def team_table(request):
     for team in range(len(elo_chart_po)):
         elo_chart_po[team] = json.dumps(elo_chart_po[team], cls=DecimalEncoder)
 
-    context_dict = {'table_headers' : table_headers,'table_values' : table_values, 'elo_chart': elo_chart, 'elo_chart_po': elo_chart_po}
+
+    # ELO past 5 games chart
+    dummy = team_finish_elo.values()
+    elo_history = list()
+    for team in dummy:
+        elo_history.append(list())
+        for i in range(5):
+            elo_history[-1].append(team["elo_min" + str(i)])
+
+
+
+
+    context_dict = {'table_headers' : table_headers,'table_values' : table_values, 'elo_chart': elo_chart, 'elo_chart_po': elo_chart_po, 'elo_history' : elo_history}
 
     return render(request, 'app_soccer_power_ranking/ranking.html', context_dict)
 

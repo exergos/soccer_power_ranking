@@ -159,6 +159,9 @@ def elo(input_data, simulations = 10000):
 
     print('ELO Algorithm finished')
 
+
+    # Round ELO
+    elo_rating_after_game = np.round(elo_rating_after_game)
     output = list([[input_data[0], elo_rating_after_game[-1,:]], input_data[1]])
 
     # For every team, the evolution of their ELO rating

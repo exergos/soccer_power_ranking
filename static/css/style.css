@@ -14,6 +14,13 @@
     height: 30;
 }
 
+.tooltiptext{
+    display: none;
+}
+
+body {
+    padding: 50px;
+}
 /*
 #div Style -Charts
 ------------------------------------------------------------------ */

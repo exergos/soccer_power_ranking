@@ -451,7 +451,7 @@ def montecarlo(data, simulations, actual = 0):
     league_ranking_distribution_po_final = np.zeros((number_of_teams,number_of_teams))
     for i in range(len(league_ranking_distribution_po)):
         league_ranking_distribution_po_final += league_ranking_distribution_po[i]
-    league_ranking_distribution_po_final = league_ranking_distribution_po_final/(simulations_po*simulations_po)
+    league_ranking_distribution_po_final = league_ranking_distribution_po_final/(simulations*simulations_po)
 
     sim_end = time.time()
     print('Regular Season League Ranking Distribution finished in', round(sim_end - sim_start,0),'seconds')
