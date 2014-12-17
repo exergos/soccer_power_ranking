@@ -29,9 +29,10 @@ def team_table(request):
     standard_ranking = standings.objects.all()
 
     standard_ranking_chart_values = list()
-    standard_ranking_chart_headers = ["Team","P","G","W","L","T","GF","GA","GD"]
+    standard_ranking_chart_headers = ["Rank","Team","P","G","W","L","T","GF","GA","GD"]
     for i in range(len(standard_ranking.values())):
         standard_ranking_chart_values.append(list())
+        standard_ranking_chart_values[i].append(standard_ranking.values()[i]["rank"])
         standard_ranking_chart_values[i].append(standard_ranking.values()[i]["team"])
         standard_ranking_chart_values[i].append(standard_ranking.values()[i]["points"])
         standard_ranking_chart_values[i].append(standard_ranking.values()[i]["games"])
@@ -137,9 +138,7 @@ def team_table(request):
     for team in dummy:
         elo_history.append(list())
         for i in range(5):
-            elo_history[-1].append(team["elo_min" + str(i)])
-
-
+            elo_history[-1].append(str(team["elo_min" + str(i)]))
 
 
     context_dict = {'table_headers' : table_headers,'table_values' : table_values, 'elo_chart': elo_chart, 'elo_chart_po': elo_chart_po, 'elo_history' : elo_history}

@@ -16,30 +16,46 @@
 {#Google Charts#}
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 {#Script to load tablesorter, create charts and fill table#}
+<script type="text/javascript">
+    // Add +/- compared to last week to ELO Rating
+    {#    google.load("visualization", "1", {packages:["corechart"]});#}
+    function addELOchange() {
+        var number_of_teams = 0;
+        {% for elo_history_i in elo_history %}
+            // Define elo_change
+            var elo_history_data = {{ elo_history_i |safe}};
+            {#            elo_history_data = google.visualization.arrayToDataTable(elo_history_data);#}
+            //
+            var elo_change = Math.round(parseFloat(elo_history_data[0]) - parseFloat(elo_history_data[1]));
 
+            if (elo_change > 0) {
+                // Positive change in ELO
+                elo_change= "<font color='#006666'>" + "<strong>" + "+" + String(elo_change) + "</strong>" + "</font>";
+            }
+            else {
+                // Negative change in ELO
+                elo_change= "<font color='#CC0000'>" + "<strong>"  + String(elo_change) + "</strong>" + "</font>"
+            }
+
+            // Find element where ELO rating is shown & add
+{#            $('#ranking').find('tbody').find('tr').eq(number_of_teams).find('td').last().after('<td>' + elo_change + '</td>');#}
+            $('#ranking').find('tbody').find('tr').eq(number_of_teams).find('td').eq(-1).append(elo_change);
+
+            // Next team
+            number_of_teams = number_of_teams + 1;
+        {% endfor %}
+    }
+</script>
 <script type="text/javascript">
 {#On document ready, load stuff#}
 $(document).ready(function()
 {
     $("#ranking").tablesorter();
 
-
+    addELOchange()
 });
 
-// Add +/- compared to last week to ELO Rating
-number_of_teams = 0;
-{% for elo_history_i in elo_history %}
-    // Define elo_change
-    var elo_history_data = {{ elo_history_i }};
-    var elo_change = parseFloat(elo_history_data[0]) - parseFloat(elo_history_data[1]);
 
-    // Find element where ELO rating is shown
-    $('#ranking').find('tbody').find('tr').eq(number_of_teams).find('td').
-            .last().after('<td>' + google_chart_img_elo.outerHTML + '</td>');
-
-    // Next team
-    number_of_teams = number_of_teams + 1;
-{% endfor %}
 
 google.load("visualization", "1", {packages:["corechart"]});
 google.setOnLoadCallback(drawChart);

@@ -57,6 +57,7 @@ class standings(models.Model):
         return [(field.name, field.value_to_string(self)) for field in game_data._meta.fields]
 
     # Field 1: Team Name
+    rank = models.IntegerField(default=0)
     team = models.TextField(default='')
     # Other fields: SPI, off rating, def rating
     games = models.IntegerField(default=0)

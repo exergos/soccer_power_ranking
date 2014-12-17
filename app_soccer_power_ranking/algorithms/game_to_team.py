@@ -91,7 +91,7 @@ def game_to_team(input_data):
 
     # Make ranking
     # Games Played - Wins - Losses - Ties - Goals For - Goals Against - Goal Diff - Points
-    team_data = np.zeros((number_of_teams,8))
+    team_data = np.zeros((number_of_teams,9))
     for i in range(len(game_data)):
         if game_data[i,4] == 1: # Game played
             # Games played
@@ -140,5 +140,36 @@ def game_to_team(input_data):
                     # Win Visitor
                     team_data[game_data[i,1],1] = team_data[game_data[i,1],1] + 1
 
+    # Determine Rank (Add as 8th column)
+    # First by points
+    team_data[:,8] = np.argsort(team_data[:, 7])[::-1]
+
+    # Then by W (column
+    for i in range(len(team_data)-1):
+        # If points equal
+        if team_data[team_data[i,8],7] == team_data[team_data[i+1,8],7]:
+            print("hebbes " + str(i))
+            # Check wins
+            if team_data[team_data[i,8],1] < team_data[team_data[i+1,8],1]:
+                # If i+1 has more wins than i, change ranking
+                team_data[team_data[i,8],8],team_data[team_data[i+1,8],8] = team_data[team_data[i+1,8],8],team_data[team_data[i,8],8]
+                continue
+            else:
+                # If wins also equal
+                if team_data[team_data[i,8],1] == team_data[team_data[i+1,8],1]:
+                    # Check Goal Difference
+                    if team_data[team_data[i,8],6] < team_data[team_data[i+1,8],6]:
+                        # If i+1 has better GD than i, change ranking
+                        team_data[team_data[i,8],8],team_data[team_data[i+1,8],8]= team_data[team_data[i+1,8],8],team_data[team_data[i,8],8]
+                        continue
+
+                        # Then by GD
+
+                        # Then by GF
+    # Map indices back to league ranking
+    dummy = np.zeros((1,number_of_teams))
+    for i in range(len(team_data)):
+        dummy[0,team_data[i,8]] = i+1
+    team_data[:,8] = dummy
     # What does module return?
     return list([team_names[0], game_data, team_data])

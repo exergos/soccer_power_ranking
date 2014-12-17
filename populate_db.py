@@ -27,7 +27,7 @@ def populate():
 
     # Fill database
     for i in range(len(standings_data[2])): # For every team
-        d_standings = {'team' : standings_data[0][i],'games' : standings_data[2][i,0], 'win' : standings_data[2][i,1], 'loss' : standings_data[2][i,2], 'tie' : standings_data[2][i,3], 'goals_for' : standings_data[2][i,4], 'goals_against' : standings_data[2][i,5], 'goal_difference' : standings_data[2][i,6], 'points' : standings_data[2][i,7]}
+        d_standings = {'rank' :standings_data[2][i,8], 'team' : standings_data[0][i], 'games' : standings_data[2][i,0], 'win' : standings_data[2][i,1], 'loss' : standings_data[2][i,2], 'tie' : standings_data[2][i,3], 'goals_for' : standings_data[2][i,4], 'goals_against' : standings_data[2][i,5], 'goal_difference' : standings_data[2][i,6], 'points' : standings_data[2][i,7]}
 
         standings.objects.create(**d_standings)
 
