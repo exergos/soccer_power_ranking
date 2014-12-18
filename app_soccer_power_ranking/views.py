@@ -149,7 +149,7 @@ def game_table(request):
     import datetime
     # Standard Ranking
     # Select Game
-    game = game_data.objects.filter(id="10768")
+    game = game_data.objects.filter(id="18850")
 
     game_headers = ["Date","Host", "Visitor", "Host Win %", "Tie %", "Visitor Win %"]
     game_values = list()
@@ -168,8 +168,8 @@ def game_table(request):
 
         game_values.append(str(game.values()[0]["host_goal"]))
         game_values.append(str(game.values()[0]["visitor_goal"]))
-        game_values.append(str(round(100*game.values()[0]["upset"],0))+"%")
-        game_values.append(str(round(100*game.values()[0]["excitement"],0))+"%")
+        game_values.append(str(round(game.values()[0]["upset"],2)))
+        game_values.append(str(round(game.values()[0]["excitement"],2)))
 
 
     # All games played in last season
@@ -188,18 +188,13 @@ def game_table(request):
         games_values[i].append(str(round(100*dummy["visitor_elo"],0)) + "%")
         games_values[i].append(str(dummy["host_goal"]))
         games_values[i].append(str(dummy["visitor_goal"]))
-        games_values[i].append(str(round(100*dummy["upset"],0))+"%")
-        games_values[i].append(str(round(100*dummy["excitement"],0))+"%")
+        games_values[i].append(str(round(dummy["upset"],2)))
+        games_values[i].append(str(round(dummy["excitement"],2)))
 
 
     context_dict = {'game_headers' : game_headers,'game_values' : game_values, 'games_headers' : games_headers, 'games_values' : games_values}
 
     return render(request, 'app_soccer_power_ranking/games.html', context_dict)
-
-
-
-# def chart(request):
-#     return(request, 'app_soccer_power_ranking/chart.html')
 
 def chart(request):
     # from django.db import connection
@@ -210,7 +205,7 @@ def chart(request):
     # cursor.execute("SHOW GLOBAL VARIABLES LIKE 'wait_timeout'")
     # print cursor.fetchone()
     # Select Game
-    game = game_data.objects.filter(id="10768")
+    game = game_data.objects.filter(id="18850")
     # Game Chance chart
     # game_chart
     minutes = 90

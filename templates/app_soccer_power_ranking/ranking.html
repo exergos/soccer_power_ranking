@@ -20,6 +20,7 @@
     // Add +/- compared to last week to ELO Rating
     {#    google.load("visualization", "1", {packages:["corechart"]});#}
     function addELOchange() {
+        $('#ranking').find('thead').find('tr').eq(0).find('th').eq(13).after('<th>' + '<font face = "symbol">D</font>' + "ELO" + '</th>');
         var number_of_teams = 0;
         {% for elo_history_i in elo_history %}
             // Define elo_change
@@ -39,7 +40,7 @@
 
             // Find element where ELO rating is shown & add
 {#            $('#ranking').find('tbody').find('tr').eq(number_of_teams).find('td').last().after('<td>' + elo_change + '</td>');#}
-            $('#ranking').find('tbody').find('tr').eq(number_of_teams).find('td').eq(-1).append(elo_change);
+            $('#ranking').find('tbody').find('tr').eq(number_of_teams).find('td').eq(13).after('<td>' + elo_change + '</td>');
 
             // Next team
             number_of_teams = number_of_teams + 1;
@@ -48,11 +49,12 @@
 </script>
 <script type="text/javascript">
 {#On document ready, load stuff#}
-$(document).ready(function()
-{
-    $("#ranking").tablesorter();
-
-    addELOchange()
+$(document).ready(function(){
+    addELOchange();
+    $("#ranking").tablesorter({
+    // sort on the first column (rank), order asc
+    sortList:  [[0,0],[2,0]]
+});
 });
 
 
@@ -323,7 +325,7 @@ function drawChart() {
     {% for values in table_values %}
         <tr>
             {% for value in values %}
-                {% if forloop.first %}
+                {% if forloop.counter == 2 %}
                     <td><img src="{% static "images/Team Logos/"%}{{ value }}{{ ".png" }}" height="20" width="20"/>&nbsp;{{ value }}</td>
                 {% else %}
                     <td>{{ value }}</td>

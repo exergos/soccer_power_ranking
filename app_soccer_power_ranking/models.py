@@ -22,7 +22,8 @@ class elo_data(models.Model):
     # Field 1: Team Name
     team = models.TextField(default='')
     # Other fields: SPI, off rating, def rating
-    elo = models.DecimalField(max_digits= 30, decimal_places= 2,default=0)
+    # Save elo as integer (easier for ranking page)
+    elo = models.IntegerField(default=0)
 
     # To loop through field names and field values in template
     def get_fields(self):

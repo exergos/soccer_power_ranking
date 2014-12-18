@@ -207,41 +207,55 @@ def extend_upcoming_prob(input_data_game,input_data_team, algorithm):
     return input_data_game
 
 def upset(input_data):
+    import numpy as np
     # only for last season
     for i in range(len(input_data[0])):
         # only for games played
         if input_data[0][i]["played"] == "1":
             host_win = input_data[0][i]["host_elo"]
             visitor_win = input_data[0][i]["visitor_elo"]
+            tie = input_data[0][i]["tie_elo"]
             gd = int(input_data[0][i]["host_goal"]) - int(input_data[0][i]["visitor_goal"])
 
             # host win
             if input_data[0][i]["result"] == "1":
-                b = ((host_win-0.5)*10)/(1-(1/((host_win-0.5)*10+2)))
-                a = -b/((host_win-0.5)*10+2)
-
                 if host_win >= 0.5:
-                    c = 0
+                    gdx = 10*host_win - 4
+                    upset1 = 25*(host_win-0.5)**2
+                    lh = np.array([[2*gdx,1,0],[gdx**2,gdx,1],[1,1,1]])
+                    rh = np.array([0,0,upset1])
+                    coeff = np.linalg.solve(lh,rh)
                 else:
-                    c = 1/host_win
+                    gdx = 1
+                    upset3 = -10*host_win+5
+                    lh = np.array([[2*gdx,1,0],[gdx**2,gdx,1],[9,3,1]])
+                    rh = np.array([0,0,upset3])
+                    coeff = np.linalg.solve(lh,rh)
 
-                input_data[0][i]["upset"] = (1-host_win)/host_win + a*gd**2 + b*gd + c
+
+                input_data[0][i]["upset"] = (1-host_win)/host_win + coeff[0]*gd**2 + coeff[1]*gd + coeff[2]
 
             # visitor win
             if input_data[0][i]["result"] == "-1": # visitor win
-                b = -((visitor_win-0.5)*10)/(1+(1/((0.5-visitor_win)*10-2)))
-                a = -b/((0.5 - visitor_win)*10-2)
-
                 if visitor_win >= 0.5:
-                    c = 0
+                    gdx = -(10*visitor_win - 4)
+                    upset1 = 25*(visitor_win-0.5)**2
+                    lh = np.array([[2*gdx,1,0],[gdx**2,gdx,1],[1,1,1]])
+                    rh = np.array([0,0,upset1])
+                    coeff = np.linalg.solve(lh,rh)
                 else:
-                    c = 1/visitor_win
+                    gdx = -1
+                    upset3 = -10*visitor_win+5
+                    lh = np.array([[2*gdx,1,0],[gdx**2,gdx,1],[1,1,1]])
+                    rh = np.array([0,0,upset3])
+                    coeff = np.linalg.solve(lh,rh)
 
-                input_data[0][i]["upset"] = (1-visitor_win)/visitor_win + a*gd**2 + b*gd + c
+
+                input_data[0][i]["upset"] = (1-visitor_win)/visitor_win + coeff[0]*gd**2 + coeff[1]*gd + coeff[2]
 
             # tie
             if input_data[0][i]["result"] == "0": # tie
-                input_data[0][i]["upset"] = max(host_win,visitor_win) / min(host_win,visitor_win)
+                input_data[0][i]["upset"] = max(host_win,visitor_win) / tie
 
     return input_data
 
@@ -258,7 +272,6 @@ def excitement(input_data):
             for j in range(1,90):
                 # Check if league change
                 if sign(int(input_data[0][i]["minute_" + str(j+1)])) != sign(int(input_data[0][i]["minute_" + str(j)])):
-                    # print(str(j) + " - " + str(sign(input_data[0][i]["minute_" + str(j+1)])) + " " + str(sign(input_data[0][i]["minute_" + str(j)])))
                     result_changes += abs(sign(int(input_data[0][i]["minute_" + str(j+1)]))) + abs(sign(int(input_data[0][i]["minute_" + str(j)])))
 
             input_data[0][i]["excitement"] = result_changes + (input_data[0][i]["upset"]*number_of_goals)**1/2 + input_data[0][i]["upset"]**1/3

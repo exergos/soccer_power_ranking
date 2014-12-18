@@ -84,7 +84,7 @@ def populate():
         # name as key and the property val as its value
 
         # d is dictionary of field names and values
-        d_elo = {'team' : output_elo[0][0][0][i],'elo' : output_elo[0][0][1][i]}
+        d_elo = {'team' : output_elo[0][0][0][i],'elo' : int(output_elo[0][0][1][i])}
         d_elo_po = {'team' : output_elo[0][0][0][i]}
         for j in range(16):
             d_elo['finish_%s' % (j+1)] = output_elo[0][1][i,j]
