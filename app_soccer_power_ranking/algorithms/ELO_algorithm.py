@@ -249,10 +249,25 @@ def excitement(input_data):
     # only for last season
     for i in range(len(input_data[0])):
         if input_data[0][i]["played"] == "1":
+            # number of times during game that the result changes
+            result_changes = 0
+            number_of_goals = int(input_data[0][i]["host_goal"]) + int(input_data[0][i]["visitor_goal"])
+            # Check for gd not equal to 0 in first minute
+            if sign(int(input_data[0][i]["minute_" + str(1)])) != 0:
+                result_changes += 1
             for j in range(1,90):
-                change_host = abs(input_data[0][i]["minute_" + str(j+1) + "_host"]-input_data[0][i]["minute_" + str(j) + "_host"])
-                change_tie = abs(input_data[0][i]["minute_" + str(j+1) + "_tie"]-input_data[0][i]["minute_" + str(j) + "_tie"])
-                change_visitor = abs(input_data[0][i]["minute_" + str(j+1) + "_visitor"]-input_data[0][i]["minute_" + str(j) + "_visitor"])
-                input_data[0][i]["excitement"] = change_host + change_tie + change_visitor
+                # Check if league change
+                if sign(int(input_data[0][i]["minute_" + str(j+1)])) != sign(int(input_data[0][i]["minute_" + str(j)])):
+                    # print(str(j) + " - " + str(sign(input_data[0][i]["minute_" + str(j+1)])) + " " + str(sign(input_data[0][i]["minute_" + str(j)])))
+                    result_changes += abs(sign(int(input_data[0][i]["minute_" + str(j+1)]))) + abs(sign(int(input_data[0][i]["minute_" + str(j)])))
+
+            input_data[0][i]["excitement"] = result_changes + (input_data[0][i]["upset"]*number_of_goals)**1/2 + input_data[0][i]["upset"]**1/3
 
     return input_data
+
+# For use within excitement function
+def sign(number):
+    """Will return 1 for positive,
+    -1 for negative, and 0 for 0"""
+    try:return number/abs(number)
+    except ZeroDivisionError:return 0
