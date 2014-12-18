@@ -109,6 +109,7 @@ def populate():
 
     from app_soccer_power_ranking.algorithms.ELO_algorithm import excitement
     input_data = excitement(input_data)
+
     # Fill table with all this data
     for season in range(len(input_data)): #delta (goal difference)
         for game in range(len(input_data[season])): # game result

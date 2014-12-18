@@ -209,15 +209,39 @@ def extend_upcoming_prob(input_data_game,input_data_team, algorithm):
 def upset(input_data):
     # only for last season
     for i in range(len(input_data[0])):
+        # only for games played
         if input_data[0][i]["played"] == "1":
-            # Max chance of host win
-            if input_data[0][i]["host_elo"] == max(input_data[0][i]["host_elo"],input_data[0][i]["tie_elo"],input_data[0][i]["visitor_elo"]):
-                input_data[0][i]["upset"] = 1 - input_data[0][i]["host_elo"] + abs(int(input_data[0][i]["host_goal"])-int(input_data[0][i]["visitor_goal"]))*input_data[0][i]["host_elo"]/10
-            else:
-                if input_data[0][i]["tie_elo"] == max(input_data[0][i]["host_elo"],input_data[0][i]["tie_elo"],input_data[0][i]["visitor_elo"]):
-                    input_data[0][i]["upset"] = 1 - input_data[0][i]["tie_elo"] + abs(int(input_data[0][i]["host_goal"])-int(input_data[0][i]["visitor_goal"]))*input_data[0][i]["tie_elo"]/10
+            host_win = input_data[0][i]["host_elo"]
+            visitor_win = input_data[0][i]["visitor_elo"]
+            gd = int(input_data[0][i]["host_goal"]) - int(input_data[0][i]["visitor_goal"])
+
+            # host win
+            if input_data[0][i]["result"] == "1":
+                b = ((host_win-0.5)*10)/(1-(1/((host_win-0.5)*10+2)))
+                a = -b/((host_win-0.5)*10+2)
+
+                if host_win >= 0.5:
+                    c = 0
                 else:
-                    input_data[0][i]["upset"] = 1 - input_data[0][i]["visitor_elo"] + abs(int(input_data[0][i]["host_goal"])-int(input_data[0][i]["visitor_goal"]))*input_data[0][i]["visitor_elo"]/10
+                    c = 1/host_win
+
+                input_data[0][i]["upset"] = (1-host_win)/host_win + a*gd**2 + b*gd + c
+
+            # visitor win
+            if input_data[0][i]["result"] == "-1": # visitor win
+                b = -((visitor_win-0.5)*10)/(1+(1/((0.5-visitor_win)*10-2)))
+                a = -b/((0.5 - visitor_win)*10-2)
+
+                if visitor_win >= 0.5:
+                    c = 0
+                else:
+                    c = 1/visitor_win
+
+                input_data[0][i]["upset"] = (1-visitor_win)/visitor_win + a*gd**2 + b*gd + c
+
+            # tie
+            if input_data[0][i]["result"] == "0": # tie
+                input_data[0][i]["upset"] = max(host_win,visitor_win) / min(host_win,visitor_win)
 
     return input_data
 

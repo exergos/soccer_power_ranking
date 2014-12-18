@@ -148,7 +148,6 @@ def game_to_team(input_data):
     for i in range(len(team_data)-1):
         # If points equal
         if team_data[team_data[i,8],7] == team_data[team_data[i+1,8],7]:
-            print("hebbes " + str(i))
             # Check wins
             if team_data[team_data[i,8],1] < team_data[team_data[i+1,8],1]:
                 # If i+1 has more wins than i, change ranking
