@@ -2,26 +2,27 @@
 {% load staticfiles %}
 {#Import custom made template tags and filters:#}
 {% load app_soccer_power_ranking_extra_templates %}
+
+<html>
+<head>
 {#This import css file (static)#}
 <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'css/jquery.qtip.min.css' %}" />
-<html>
-<head>
 {#JQuery for basic tools#}
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 {#Tablesorter to make table sortable via columns#}
 {#Added locally as a static file#}
 <script src="{% static "js/tablesorter/jquery.tablesorter.js" %}"></script>
-<script src="{% static "js/jquery.qtip.min.js" %}"></script>
+<script src="{% static "js/qtip2/jquery.qtip.min.js" %}"></script>
 {#Google Charts#}
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 {#Script to load tablesorter, create charts and fill table#}
 
 <script type="text/javascript">
     // Add +/- compared to last week to ELO Rating
-    {#    google.load("visualization", "1", {packages:["corechart"]});#}
     function addELOchange() {
-        $('#ranking').find('thead').find('tr').eq(0).find('th').eq(13).after('<th>' + '<font face = "symbol">D</font>' + "ELO" + '</th>');
+        var table_ranking = $('#ranking');
+        table_ranking.find('thead').find('tr').eq(0).find('th').last().after('<th id="' + 'th_dELO"' + ' >' + '<font face = "symbol">D</font>' + "ELO" + '</th>');
         var number_of_teams = 0;
         {% for elo_history_i in elo_history %}
             // Define elo_change
@@ -38,174 +39,236 @@
             }
 
             // Find element where ELO rating is shown & add
-{#            $('#ranking').find('tbody').find('tr').eq(number_of_teams).find('td').last().after('<td>' + elo_change + '</td>');#}
-            $('#ranking').find('tbody').find('tr').eq(number_of_teams).find('td').eq(13).after('<td>' + elo_change + '</td>');
+            var td_html = '<td ' + 'id="' + 'td_dELO_team_' + String(number_of_teams+1) + '" >' + elo_change + '</td>';
+            table_ranking.find('tbody').find('tr').eq(number_of_teams).find('td').last().after(td_html);
 
             // Next team
-            number_of_teams = number_of_teams + 1;
+            number_of_teams += 1;
         {% endfor %}
     }
 </script>
 
 <script type="text/javascript">
-{#On document ready, load stuff#}
-$(document).ready(function(){
-    addELOchange();
 
-{#    google.setOnLoadCallback(drawChart);#}
-    drawChart("elo")
-    drawChart("elo_po")
-    drawChart("elo_hist")
-    $("#ranking").tablesorter({
-    // sort on the first column (rank), order asc
-    sortList:  [[0,0],[2,0]]
-});
-});
+    // Add Playoff chances, based on ELO REG chart
+    function addPOchances() {
+        // Add header
+        $('#th_ELO_REG').before('<th id="' + 'th_ELO_REG_CHANCES" >'+ "ELO PO CHANCES" + '</th>');
+
+        // For every team, calculate po1/2/3 chances
+        {% for elo_chart_i in elo_chart %}
+            var team_elo = {{ elo_chart_i |safe }};
+            // Calculate PO 1, PO 2 and PO3 chances
+            // PO 1
+            var po1_chance = 0;
+            for (i = 16; i >= 11; i--) {
+                po1_chance += parseFloat(team_elo[i][1]);
+            }
+            // PO 2
+            var po2_chance = 0;
+            for (i = 10; i >= 3; i--) {
+                po2_chance += parseFloat(team_elo[i][1]);
+            }
+            // PO 1
+            var po3_chance = 0;
+            for (i = 2; i >= 1; i--) {
+                po3_chance += parseFloat(team_elo[i][1]);
+            }
+
+            // Clean data
+            // Make sure percentages sum to 100
+            po_chances_array = [po1_chance,po2_chance,po3_chance];
+            if (Math.round(100*po1_chance) + Math.round(100*po2_chance) + Math.round(100*po3_chance) != 100) {
+                var max_index = po_chances_array.indexOf(Math.max.apply(Math, po_chances_array));
+                if (Math.round(100*po1_chance) + Math.round(100*po2_chance) + Math.round(100*po3_chance) > 100) {
+                    po_chances_array[max_index] -= 0.005
+                } else {
+                    po_chances_array[max_index] += 0.005
+                }
+            }
+            po1_chance = Math.round(100*po_chances_array[0]);
+            po2_chance = Math.round(100*po_chances_array[1]);
+            po3_chance = Math.round(100*po_chances_array[2]);
+
+            var po1_chance_html = "<font color='#007700'>" + '<strong>PO I: </strong>' +  String(po1_chance) + "%" + "</font>" + '<br>';
+            var po2_chance_html = "<font color='#0000FF'>" + '<strong>PO II: </strong>' +  String(po2_chance) + "%" + "</font>" + '<br>';
+            var po3_chance_html = "<font color='#FF1313'>" + '<strong>PO III: </strong>' +  String(po3_chance) + "%" + "</font>";
+
+            // Add element in table (before ELO REG Chart)
+            var td_html = '<td ' + 'id="' + 'td_ELO_REG_CHANCES_team_' + String({{ forloop.counter }}) + '" >' + po1_chance_html + po2_chance_html + po3_chance_html + '</td>';
+
+            $('#td_ELO_REG_team_' + String({{ forloop.counter }})).before(td_html);
+        {% endfor %}
+    }
+</script>
+
+<script type="text/javascript">
+    {#On document ready, load stuff#}
+    $(document).ready(function(){
+        addELOchange();
+
+        drawChart("ELO_PO");
+        drawChart("ELO_REG");
+        drawChart("ELO_HIST");
+
+        addPOchances();
+
+        $("#ranking").tablesorter({
+            // sort on the first column (rank), order asc
+            sortList:  [[0,0],[2,0]]
+        });
+    });
 </script>
 
 <script>
-google.load("visualization", "1", {packages:["corechart"]});
-function drawChart(selection) {
-    djangoData = []
-    if (selection == "elo") {
-        {% for elo_chart_i in elo_chart %}
-            djangoData.push({{ elo_chart_i |safe }});
-        {% endfor %}
-    }
-    if (selection == "elo_po") {
-        {% for elo_chart_po_i in elo_chart_po %}
-            djangoData.push({{ elo_chart_po_i |safe }});
-        {% endfor %}
-    }
-    if (selection == "elo_hist") {
-        $('#ranking').find('thead').find('tr').eq(0).find('th').eq(14).after('<th>' + "ELO HIST" + '</th>');
-        {% for elo_chart_hist_i in elo_chart_hist %}
-            djangoData.push({{ elo_chart_hist_i |safe }});
-        {% endfor %}
-    }
+    google.load("visualization", "1", {packages:["corechart"]});
+    function drawChart(selection) {
+        var th_id = '#th_dELO';
+        djangoData = [];
+        if (selection == "ELO_REG") {
+            $(th_id).after('<th id="th_' + String(selection) + '" >' + "ELO REG" + '</th>');
+            {% for elo_chart_i in elo_chart %}
+                djangoData.push({{ elo_chart_i |safe }});
+            {% endfor %}
+        }
+        if (selection == "ELO_PO") {
+            $(th_id).after('<th id="th_' + String(selection) + '" >' + "ELO PO" + '</th>');
+            {% for elo_chart_po_i in elo_chart_po %}
+                djangoData.push({{ elo_chart_po_i |safe }});
+            {% endfor %}
+        }
+        if (selection == "ELO_HIST") {
+            $(th_id).after('<th id="th_' + String(selection) + '" >' + "ELO HIST" + '</th>');
+            {% for elo_chart_hist_i in elo_chart_hist %}
+                djangoData.push({{ elo_chart_hist_i |safe }});
+            {% endfor %}
+        }
 
-    //Create charts
-    //Customize chart using options
-    //https://developers.google.com/chart/interactive/docs/customizing_axes
-    var options = {
-        vAxis: {
-            gridlines: {
-                color: 'transparent'
-            }
-        },
-        'chartArea': {'width': '100%'},
-        legend: {position: 'none'},
-        hAxis: {title: '', textColor: "#fff" },
-        baselineColor: '#fff',
-        gridlineColor: '#fff',
-        textPosition: 'none',
-        axisFontSize: 0
+        //Create charts
+        //Customize chart using options
+        //https://developers.google.com/chart/interactive/docs/customizing_axes
+        var options = {
+            vAxis: {
+                gridlines: {
+                    color: 'transparent'
+                }
+            },
+            'chartArea': {'width': '100%'},
+            legend: {position: 'none'},
+            hAxis: {title: '', textColor: "#fff" },
+            baselineColor: '#fff',
+            gridlineColor: '#fff',
+            textPosition: 'none',
+            axisFontSize: 0
 
-    };
+        };
 
-    var chart = [];
-    var number_of_charts = 0;
+        var chart = [];
+        var number_of_charts = 0;
 
-    for (team = 0; team < djangoData.length; team++) {
-        var djangoData_i = djangoData[team];
-        //Add color data to chart
-        if (selection == "elo" || selection == "elo_po") {
-            djangoData_i[0].push({ role: 'style' });
-            for (i = 1; i <= 16; i++) {
-                //If i smaller than 12, these are league positions 7-16 (i.e. out of playoffs)
-                if (i < 11) {
-                    if (i < 3) {
-                        //Play-off 3
-                        djangoData_i[i].push('red');
+        for (team = 0; team < djangoData.length; team++) {
+            var djangoData_i = djangoData[team];
+            //Add color data to chart
+            if (selection == "ELO_REG" || selection == "ELO_PO") {
+                djangoData_i[0].push({ role: 'style' });
+                for (i = 1; i <= 16; i++) {
+                    //If i smaller than 12, these are league positions 7-16 (i.e. out of playoffs)
+                    if (i < 11) {
+                        if (i < 3) {
+                            //Play-off 3
+                            djangoData_i[i].push('red');
+                        }
+                        else {
+                            //Play-off 2
+                            djangoData_i[i].push('blue');
+                        }
                     }
                     else {
-                        //Play-off 2
-                        djangoData_i[i].push('blue');
+                        //Play-off 1
+                        djangoData_i[i].push('green');
                     }
                 }
-                else {
-                    //Play-off 1
-                    djangoData_i[i].push('green');
+            }
+
+            var google_djangoData_i = google.visualization.arrayToDataTable(djangoData_i);
+            var id_name_i = 'chart_div' + selection + String(number_of_charts);
+
+            // Create div (needed to make chart, later changed to image)
+            var div_i = document.createElement('div');
+            div_i.id = id_name_i;
+
+            // Create chart object
+            if (selection == "ELO_REG" || selection == "ELO_PO") {
+                chart[number_of_charts] = new google.visualization.ColumnChart(div_i);
+            } else {
+                chart[number_of_charts] = new google.visualization.LineChart(div_i);
+            }
+            // Wait for the chart to finish drawing before calling the getImageURI() method.
+            // This makes image (PNG) of chart instead of object
+            google.visualization.events.addListener(chart[number_of_charts], 'ready', function () {
+                div_i.innerHTML = '<img src="' + chart[number_of_charts].getImageURI() + '">';
+                console.log(div_i.innerHTML);
+            });
+
+            // Draw chart command
+            chart[number_of_charts].draw(google_djangoData_i, options);
+
+            // Inside chart div is the img object
+            var google_chart_img_i = div_i.children[0];
+            google_chart_img_i.className = "chart";
+            google_chart_img_i.id = "chart_" + selection + String(number_of_charts);
+
+            // Put it inside td as an extra column in table
+            // Use outerHTML to get html string of image
+            var td_id = '#td_dELO_team_' + String(number_of_charts+1);
+            $(td_id).after('<td id="' + 'td_' + String(selection) + '_team_' + String(number_of_charts+1) + '" >' +  google_chart_img_i.outerHTML + '</td>');
+
+            var positions = 0;
+            var text_tooltip = '';
+            if (selection == "ELO_REG" || selection == "ELO_PO") {
+                if (selection == "ELO_REG") {
+                    title_tooltip = "Projected Regular Season Finish"
+                } else {
+                    title_tooltip = "Projected Playoff Finish"
+                }
+
+                for (i = djangoData_i.length-1; i >= 1; i--) {
+                    text_tooltip = text_tooltip + djangoData_i[i][0] + ": " + String(Math.round(100 * parseFloat(djangoData_i[i][1]))) + "%" + "<br>";
+                    positions = positions + 1;
                 }
             }
-        }
-
-        var google_djangoData_i = google.visualization.arrayToDataTable(djangoData_i);
-        var id_name_i = 'chart_div' + selection + String(number_of_charts);
-
-        // Create div (needed to make chart, later changed to image)
-        var div_i = document.createElement('div');
-        div_i.id = id_name_i;
-
-        // Create chart object
-        if (selection == "elo" || selection == "elo_po") {
-        chart[number_of_charts] = new google.visualization.ColumnChart(div_i);
-        } else {
-            chart[number_of_charts] = new google.visualization.LineChart(div_i);
-        }
-        // Wait for the chart to finish drawing before calling the getImageURI() method.
-        // This makes image (PNG) of chart instead of object
-        google.visualization.events.addListener(chart[number_of_charts], 'ready', function () {
-            div_i.innerHTML = '<img src="' + chart[number_of_charts].getImageURI() + '">';
-            console.log(div_i.innerHTML);
-        });
-
-        // Draw chart command
-        chart[number_of_charts].draw(google_djangoData_i, options);
-
-        // Inside chart div is the img object
-        var google_chart_img_i = div_i.children[0];
-        google_chart_img_i.className = "chart";
-        google_chart_img_i.id = "chart_" + selection + String(number_of_charts);
-
-        // Put it inside td as an extra column in table
-        // Use outerHTML to get html string of image
-        if (selection == "elo" || selection == "elo_po") {
-            $('#ranking').find('tbody').find('tr').eq(number_of_charts).find('td').last().after('<td>' + google_chart_img_i.outerHTML + '</td>');
-        }
-
-        if (selection == "elo_hist") {
-            $('#ranking').find('tbody').find('tr').eq(number_of_charts).find('td').eq(14).after('<td>' + google_chart_img_i.outerHTML + '</td>');
-        }
-
-        var positions = 0;
-        var text_tooltip = '';
-        if (selection == "elo" || selection == "elo_po") {
-            if (selection == "elo") {
-                title_tooltip = "Projected Regular Season Finish"
-            } else {
-                title_tooltip = "Projected Playoff Finish"
+            if (selection == "ELO_HIST") {
+                title_tooltip = "ELO Past 5 Games";
+                for (i = djangoData_i.length-1; i >= 1; i--) {
+                    text_tooltip = text_tooltip + "ELO " + String(i - djangoData_i.length + 1) + ": " + String(Math.round(parseFloat(djangoData_i[i][1]))) + "<br>";
+                    positions = positions + 1;
+                }
             }
+            // Add tooltip using qtip2
 
-            for (i = djangoData_i.length-1; i >= 1; i--) {
-                text_tooltip = text_tooltip + djangoData_i[i][0] + ": " + String(Math.round(100 * parseFloat(djangoData_i[i][1]))) + "%" + "<br>";
-                positions = positions + 1;
-            }
+            $('#' + google_chart_img_i.id).qtip({
+
+                style: {
+                    classes: 'qtip-dark'},
+{#                    tip: {#}
+{#                        corner: 'bottom center',#}
+{#                        mimic: 'bottom left'#}
+{#                    }#}
+{#                },#}
+{#                position: {#}
+{#                    target: 'mouse', // Track the mouse as the positioning target#}
+{#                    adjust: { x: 5, y: 5 } // Offset it slightly from under the mouse#}
+{#                },#}
+                content: {
+                    title: title_tooltip,
+                    text: text_tooltip
+                }
+            });
+
+            // Go to next chart
+            number_of_charts = number_of_charts + 1;
         }
-        if (selection == "elo_hist") {
-            title_tooltip = "ELO Past 5 Games"
-            for (i = djangoData_i.length-1; i >= 1; i--) {
-                text_tooltip = text_tooltip + djangoData_i[i][0] + ": " + String(Math.round(100 * parseFloat(djangoData_i[i][1]))) + "<br>";
-                positions = positions + 1;
-            }
-        }
-        // Add tooltip using qtip2
-
-        $('#' + google_chart_img_i.id).qtip({
-            position: {
-                target: 'mouse', // Track the mouse as the positioning target
-                adjust: { x: 5, y: 5 } // Offset it slightly from under the mouse
-            },
-            content: {
-                title: title_tooltip,
-                text: text_tooltip
-            }
-        });
-
-        // Go to next chart
-        number_of_charts = number_of_charts + 1;
     }
-};
 </script>
 
 </head>
@@ -218,21 +281,19 @@ function drawChart(selection) {
     <thead>
     <tr>
         {% for header in table_headers %}
-            <th>{{ header }}</th>
+            <th id ="{{ "th_" }}{{ header }}">{{ header }}</th>
         {% endfor %}
-        <th>PROJ REG</th>
-        <th>PROJ PO</th>
     </tr>
     </thead>
     {#        Fill rest of table with data#}
     <tbody>
     {% for values in table_values %}
-        <tr>
+        <tr id="{{ "tr_" }}{{ "team_" }}{{ forloop.counter }}">
             {% for value in values %}
                 {% if forloop.counter == 2 %}
-                    <td><img src="{% static "images/Team Logos/"%}{{ value }}{{ ".png" }}" height="20" width="20"/>&nbsp;{{ value }}</td>
+                    <td id="{{ "td_" }}{{ table_headers | get_at_index:forloop.counter }}{{ "_team_" }}{{ forloop.parentloop.counter }}"><img src="{% static "images/Team Logos/"%}{{ value }}{{ ".png" }}" height="20" width="20"/>&nbsp;{{ value }}</td>
                 {% else %}
-                    <td>{{ value }}</td>
+                    <td id="{{ "td_" }}{{ table_headers | get_at_index:forloop.counter }}{{ "_team_" }}{{ forloop.parentloop.counter }}">{{ value }}</td>
                 {% endif %}
             {% endfor %}
         </tr>
