@@ -168,10 +168,13 @@ def elo(input_data, simulations = 10000):
     elo_evolution = list()
     for i in range(number_of_teams):
         elo_evolution.append(list())
-        indexes = np.unique(elo_rating_after_game[:,i],return_index = True)[1]
-        elo_evolution[i] = [elo_rating_after_game[index,i] for index in sorted(indexes)]
-        if elo_evolution[i][0] == 1500:
-            del elo_evolution[i][0]
+
+    count_games = 0
+    for i in range(len(input_data[1])):
+        if input_data[1][i,4] == 1: # Game Played
+            elo_evolution[int(input_data[1][i,0])].append(elo_rating_after_game[count_games,int(input_data[1][i,0])])
+            elo_evolution[int(input_data[1][i,1])].append(elo_rating_after_game[count_games,int(input_data[1][i,1])])
+            count_games += 1
 
     # Output is a list of 2 items
     # [0]:  List of 2 things
