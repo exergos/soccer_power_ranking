@@ -163,20 +163,15 @@ def elo(input_data, simulations = 10000):
     # Round ELO (while keeping differences the same for two teams who played against eachother)
     for i in range(len(elo_rating_after_game)-1):
         if i == 0:
-            # diff0 = (elo_rating_after_game[i,int(input_data[1][i,0])] - elo_start)
-            # diff1 = (elo_rating_after_game[i,int(input_data[1][i,1])] - elo_start)
             diff0_round = np.round(elo_rating_after_game[i,int(input_data[1][i,0])]) - np.round(elo_start)
             diff1_round = np.round(elo_rating_after_game[i,int(input_data[1][i,1])]) - np.round(elo_start)
         else:
-            # diff0 = (elo_rating_after_game[i,int(input_data[1][i,0])] - elo_rating_after_game[i-1,int(input_data[1][i,0])])
-            # diff1 = (elo_rating_after_game[i,int(input_data[1][i,1])] - elo_rating_after_game[i-1,int(input_data[1][i,1])])
             diff0_round = np.round(elo_rating_after_game[i,int(input_data[1][i,0])]) - np.round(elo_rating_after_game[i-1,int(input_data[1][i,0])])
             diff1_round = np.round(elo_rating_after_game[i,int(input_data[1][i,1])]) - np.round(elo_rating_after_game[i-1,int(input_data[1][i,1])])
         if abs(diff0_round) - abs(diff1_round) == 0:
             elo_rating_after_game[i-1,:] = np.round(elo_rating_after_game[i-1,:])
             elo_rating_after_game[i,:] = np.round(elo_rating_after_game[i,:])
         else:
-            print("jup")
             if abs(diff0_round) > abs(diff1_round):
                 elo_rating_after_game[i,int(input_data[1][i,0])] = elo_rating_after_game[i,int(input_data[1][i,0])] - 0.5
                 elo_rating_after_game[i-1,int(input_data[1][i,0])] = np.round(elo_rating_after_game[i-1,int(input_data[1][i,0])])
