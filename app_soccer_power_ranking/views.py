@@ -118,7 +118,17 @@ def team_table(request):
                 if name == "finish_" + str(league_positions+1):
                     elo_chart_po[team][16-league_positions].append(name.strip("finish_"))
                     elo_chart_po[team][16-league_positions].append(decimal.Decimal(value))
-                    
+
+    elo_chart_hist =  [[[] for i in repeat(None, 6)] for j in repeat(None, 16)]
+    for team in range(len(team_finish_elo)):
+        elo_chart_hist[team][0].append("elo_hist")
+        for name, value in team_finish_elo[team].get_fields():
+            if name == "team":
+                elo_chart_hist[team][0].append(value)
+            for hist in range(5):
+                if name == "elo_min" + str(hist):
+                    elo_chart_hist[team][len(elo_chart_hist[team])-1-hist].append(name)
+                    elo_chart_hist[team][len(elo_chart_hist[team])-1-hist].append(decimal.Decimal(value))
     # Django to Javascript gives problems
     # Therefore, convert using jsonEncoder!
     # Do this for every team separate, otherwise problems!
@@ -131,6 +141,9 @@ def team_table(request):
     for team in range(len(elo_chart_po)):
         elo_chart_po[team] = json.dumps(elo_chart_po[team], cls=DecimalEncoder)
 
+    for team in range(len(elo_chart_hist)):
+        elo_chart_hist[team] = json.dumps(elo_chart_hist[team], cls=DecimalEncoder)
+
 
     # ELO past 5 games chart
     dummy = team_finish_elo.values()
@@ -141,7 +154,7 @@ def team_table(request):
             elo_history[-1].append(str(team["elo_min" + str(i)]))
 
 
-    context_dict = {'table_headers' : table_headers,'table_values' : table_values, 'elo_chart': elo_chart, 'elo_chart_po': elo_chart_po, 'elo_history' : elo_history}
+    context_dict = {'table_headers' : table_headers,'table_values' : table_values, 'elo_chart': elo_chart, 'elo_chart_po': elo_chart_po, 'elo_chart_hist' : elo_chart_hist, 'elo_history' : elo_history}
 
     return render(request, 'app_soccer_power_ranking/ranking.html', context_dict)
 
@@ -217,7 +230,6 @@ def chart(request):
         game_chart[i+1].append(game.values()[0]["minute_" + str(i+1) + "_host"])
         game_chart[i+1].append(game.values()[0]["minute_" + str(i+1) + "_tie"])
         game_chart[i+1].append(game.values()[0]["minute_" + str(i+1) + "_visitor"])
-
 
     # Django to Javascript gives problems
     # Therefore, convert using jsonEncoder!
