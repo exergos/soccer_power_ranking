@@ -25,17 +25,15 @@
         {% for elo_history_i in elo_history %}
             // Define elo_change
             var elo_history_data = {{ elo_history_i |safe}};
-            {#            elo_history_data = google.visualization.arrayToDataTable(elo_history_data);#}
-            //
             var elo_change = Math.round(parseFloat(elo_history_data[0]) - parseFloat(elo_history_data[1]));
 
             if (elo_change > 0) {
                 // Positive change in ELO
-                elo_change= "<font color='#006666'>" + "<strong>" + "+" + String(elo_change) + "</strong>" + "</font>";
+                elo_change= "<font color='#007700'>" + "<strong>" + "+" + String(elo_change) + "</strong>" + "</font>";
             }
             else {
                 // Negative change in ELO
-                elo_change= "<font color='#CC0000'>" + "<strong>"  + String(elo_change) + "</strong>" + "</font>"
+                elo_change= "<font color='#FF1313'>" + "<strong>"  + String(elo_change) + "</strong>" + "</font>"
             }
 
             // Find element where ELO rating is shown & add

@@ -35,7 +35,7 @@ for i in range(16):
 
 # Other fields: possible league finishes (1 to 16)
 for i in range(5):
-    elo_data.add_to_class('elo_min%s' % i, models.DecimalField(max_digits= 30, decimal_places= 15,default=0))
+    elo_data.add_to_class('elo_min%s' % i, models.IntegerField(default=0))
 
 class elo_data_po(models.Model):
     # Field 1: Team Name
