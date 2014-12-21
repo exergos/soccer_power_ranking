@@ -247,18 +247,13 @@
             // Add tooltip using qtip2
 
             $('#' + google_chart_img_i.id).qtip({
-
                 style: {
-                    classes: 'qtip-dark'},
-{#                    tip: {#}
-{#                        corner: 'bottom center',#}
-{#                        mimic: 'bottom left'#}
-{#                    }#}
-{#                },#}
-{#                position: {#}
-{#                    target: 'mouse', // Track the mouse as the positioning target#}
-{#                    adjust: { x: 5, y: 5 } // Offset it slightly from under the mouse#}
-{#                },#}
+                    classes: 'qtip-red'
+                },
+                position: {
+                    target: 'mouse', // Track the mouse as the positioning target
+                    adjust: { x: 5, y: 5 } // Offset it slightly from under the mouse
+                },
                 content: {
                     title: title_tooltip,
                     text: text_tooltip

@@ -9,13 +9,13 @@ def populate():
     django.setup()
 
     # # # # Load sporza data
-    # from app_soccer_power_ranking.algorithms.sporza import sporza
-    # input_data = sporza("new",number_of_seasons=8)
+    from app_soccer_power_ranking.algorithms.sporza import sporza
+    input_data = sporza("update",number_of_seasons=1)
 
     # Or get it from file:
     # Import previous file
-    import pickle
-    input_data = pickle.load(open("app_soccer_power_ranking/algorithms/data/sporza.p", "rb"))  # load from file sporza.p
+    # import pickle
+    # input_data = pickle.load(open("app_soccer_power_ranking/algorithms/data/sporza.p", "rb"))  # load from file sporza.p
 
     # Standings
     # Remove previous data

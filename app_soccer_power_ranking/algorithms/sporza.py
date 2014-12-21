@@ -160,12 +160,14 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
 
 
             for j in range(len(games_upcoming_soup)): # range(len(games))
-                game_date = games_upcoming_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[0]
+                game_date = datetime.datetime.strptime(games_upcoming_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[0],"%d/%m/%Y")
+
                 host = games_upcoming_soup[j].find_all("dt")[0].get_text().replace('\n','')
 
                 match = 0
                 for k in range(len(input_data[i])):
                     if input_data[i][k]["game_date"] == game_date and input_data[i][k]["host"] == host:
+                        print(j,k)
                         match = 1
                         continue
                 if match == 0:
