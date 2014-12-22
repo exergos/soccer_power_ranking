@@ -130,7 +130,7 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
         season_page = BeautifulSoup(urllib.request.urlopen('http://sporza.be' + seasons_new[count_seasons]['value']))
 
         # Games in Season i
-        games = season_page.find_all("a", class_=["finished"])
+        games_finished = season_page.find_all("a", class_=["finished"])
 
         # Games still to play in Season i
         games_upcoming = season_page.find_all("a", class_=["upcoming"])
@@ -142,6 +142,7 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
         # Check how many games are new and added to sporza.p
         new_upcoming_games = []
 
+        # Delete doubles
         if i == 0 and algorithm == "update": # Update latest season only
             # Check to see if there are doubles:
             del_elements_index = []
@@ -149,25 +150,25 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
                 for k in range(len(input_data[i])):
                     if j is not k:
                         if input_data[i][j]["game_date"] == input_data[i][k]["game_date"] and input_data[i][j]["host"] == input_data[i][k]["host"]:
-                            if input_data[i][j]["played"] == "0":
-                                del_elements_index.append(j)
-                            if input_data[i][k]["played"] == "0":
-                                del_elements_index.append(k)
-            del_elements_index = list(set(del_elements_index))
+                            # if input_data[i][j]["played"] == "0":
+                            del_elements_index.append(j)
+                            # if input_data[i][k]["played"] == "0":
+                            del_elements_index.append(k)
+            # Delete elements (start with highest index!)
+            del_elements_index = sorted(list(set(del_elements_index)))[::-1]
+            count_del = 0
             for j in del_elements_index:
-                del output[i][j]
-                del input_data[i][j]
+                del output[i][j-count_del]
+                del input_data[i][j-count_del]
 
-
+            # Check for upcoming games that are not in dataset yet
             for j in range(len(games_upcoming_soup)): # range(len(games))
                 game_date = datetime.datetime.strptime(games_upcoming_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[0],"%d/%m/%Y")
-
                 host = games_upcoming_soup[j].find_all("dt")[0].get_text().replace('\n','')
 
                 match = 0
                 for k in range(len(input_data[i])):
                     if input_data[i][k]["game_date"] == game_date and input_data[i][k]["host"] == host:
-                        print(j,k)
                         match = 1
                         continue
                 if match == 0:
@@ -178,6 +179,7 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
             # Append list for game j in season i
             output.append(list())
 
+        # Add upcoming games
         count_upcoming_games = 0
         output_start_length = len(output[i])
         for j in new_upcoming_games:
@@ -212,14 +214,16 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
         new_games = []
         
         # Get all soups of game pages
-        games_soup = []
-        for j in range(len(games)): # range(len(games))
-            games_soup.append(BeautifulSoup(urllib.request.urlopen('http://sporza.be' + games[j]['href'])))
+        games_finished_soup = []
+        for j in range(len(games_finished)): # range(len(games))
+            games_finished_soup.append(BeautifulSoup(urllib.request.urlopen('http://sporza.be' + games_finished[j]['href'])))
 
+        # If upcoming but now played, delete upcoming
+        upcoming_to_played = []
         if i == 0 and algorithm == "update": # Update latest season only
-            for j in range(len(games_soup)): # range(len(games))
-                game_date = datetime.datetime.strptime(games_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[0],"%d/%m/%Y")
-                host = games_soup[j].find_all("dt")[0].get_text().replace('\n','')
+            for j in range(len(games_finished_soup)): # range(len(games))
+                game_date = datetime.datetime.strptime(games_finished_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[0],"%d/%m/%Y")
+                host = games_finished_soup[j].find_all("dt")[0].get_text().replace('\n','')
 
                 match = 0
                 for k in range(len(input_data[i])):
@@ -229,12 +233,18 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
                     if input_data[i][k]["game_date"] == game_date and input_data[i][k]["host"] == host and input_data[i][k]["played"] == "0":
                         match = 0
                         # Remove upcoming game (to be replaced by finished game)
-                        del output[i][k]
+                        upcoming_to_played.append(k)
                         continue
                 if match == 0:
                         new_games.append(j)
+            # Delete upcoming games that have been played
+            upcoming_to_played = sorted(list(set(upcoming_to_played)))[::-1]
+            count_del = 0
+            for j in upcoming_to_played:
+                del output[i][j-count_del]
+                del input_data[i][j-count_del]
         else:
-            new_games = list(range(len(games_soup)))
+            new_games = list(range(len(games_finished_soup)))
 
         #  For game j
         count_games = 0
@@ -242,37 +252,37 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
         for j in new_games: # range(len(games))
             # Save all categories in dict
             if algorithm == "new":
-                output_index = count_upcoming_games + count_games
+                output_index = output_start_length + count_games
             else:
                 if i == 0:
-                    output_index = output_start_length + count_upcoming_games + count_games
+                    output_index = output_start_length + count_games
                 else:
-                    output_index = count_upcoming_games + count_games
+                    output_index = output_start_length + count_games
 
             output[i].append(list())
             output[i][output_index] = dict()
 
             # Add data for new game
             # Game Date
-            output[i][output_index]["game_date"] = datetime.datetime.strptime(games_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[0],"%d/%m/%Y")
+            output[i][output_index]["game_date"] = datetime.datetime.strptime(games_finished_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[0],"%d/%m/%Y")
 
             # Game hour
-            output[i][output_index]["game_hour"] = games_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[1]
+            output[i][output_index]["game_hour"] = games_finished_soup[j].find(id="metadata").get_text().replace('\n','').split(' ')[1]
 
             # Host
-            output[i][output_index]["host"] = games_soup[j].find_all("dt")[0].get_text().replace('\n','')
+            output[i][output_index]["host"] = games_finished_soup[j].find_all("dt")[0].get_text().replace('\n','')
 
             # Visitor
-            output[i][output_index]["visitor"] = games_soup[j].find_all("dt")[1].get_text().replace('\n','')
+            output[i][output_index]["visitor"] = games_finished_soup[j].find_all("dt")[1].get_text().replace('\n','')
 
             # Played?
             output[i][output_index]["played"] = "1"
 
             # Host goals
-            output[i][output_index]["host_goal"] = games_soup[j].find_all("dd",class_=["score"])[0].get_text().replace('\n','')
+            output[i][output_index]["host_goal"] = games_finished_soup[j].find_all("dd",class_=["score"])[0].get_text().replace('\n','')
 
             # Visitor goals
-            output[i][output_index]["visitor_goal"] = games_soup[j].find_all("dd",class_=["score"])[1].get_text().replace('\n','')
+            output[i][output_index]["visitor_goal"] = games_finished_soup[j].find_all("dd",class_=["score"])[1].get_text().replace('\n','')
 
             # Result
             if int(output[i][output_index]["host_goal"]) > int(output[i][output_index]["visitor_goal"]):
@@ -283,69 +293,69 @@ def sporza_scrape(input_data, algorithm, number_of_seasons):
                 else:
                     output[i][output_index]["result"] = "-1"
 
-            if len(games_soup[j].find_all(class_="GENERIC")) is not 0: # Forfait or Lack of data check
+            if len(games_finished_soup[j].find_all(class_="GENERIC")) is not 0: # Forfait or Lack of data check
                 # Referee
-                output[i][output_index]["referee"] = games_soup[j].find_all("ul",class_=["lineupmetadata"])[0].get_text().split('\n')[1].replace('scheidsrechter: ','')
+                output[i][output_index]["referee"] = games_finished_soup[j].find_all("ul",class_=["lineupmetadata"])[0].get_text().split('\n')[1].replace('scheidsrechter: ','')
 
                 # Stadium
-                output[i][output_index]["stadium"] = games_soup[j].find_all("ul",class_=["lineupmetadata"])[0].get_text().split('\n')[2].replace('stadion: ','')
+                output[i][output_index]["stadium"] = games_finished_soup[j].find_all("ul",class_=["lineupmetadata"])[0].get_text().split('\n')[2].replace('stadion: ','')
 
                 # Spectators
-                output[i][output_index]["spectators"] = games_soup[j].find_all("ul",class_=["lineupmetadata"])[0].get_text().split('\n')[4].replace('toeschouwers: ','')
+                output[i][output_index]["spectators"] = games_finished_soup[j].find_all("ul",class_=["lineupmetadata"])[0].get_text().split('\n')[4].replace('toeschouwers: ','')
 
                 # Goal Data
-                output[i][output_index]["host_goal_data"] = sporza_scrape_function(games_soup[j].find_all("ol",class_=["eventset1"])[0],
-                                                           games_soup[j].find_all("ol",class_=["eventsethalftime"])[0],
-                                                           games_soup[j].find_all("ol",class_=["eventset2"])[0],
+                output[i][output_index]["host_goal_data"] = sporza_scrape_function(games_finished_soup[j].find_all("ol",class_=["eventset1"])[0],
+                                                           games_finished_soup[j].find_all("ol",class_=["eventsethalftime"])[0],
+                                                           games_finished_soup[j].find_all("ol",class_=["eventset2"])[0],
                                                            "host goal")
-                output[i][output_index]["visitor_goal_data"] = sporza_scrape_function(games_soup[j].find_all("ol",class_=["eventset1"])[0],
-                                                           games_soup[j].find_all("ol",class_=["eventsethalftime"])[0],
-                                                           games_soup[j].find_all("ol",class_=["eventset2"])[0],
+                output[i][output_index]["visitor_goal_data"] = sporza_scrape_function(games_finished_soup[j].find_all("ol",class_=["eventset1"])[0],
+                                                           games_finished_soup[j].find_all("ol",class_=["eventsethalftime"])[0],
+                                                           games_finished_soup[j].find_all("ol",class_=["eventset2"])[0],
                                                            "visitor goal")
 
                 # Yellow Cards
-                output[i][output_index]["host_yellow_card_data"] = sporza_scrape_function(games_soup[j].find_all("ol",class_=["eventset1"])[0],
-                                                           games_soup[j].find_all("ol",class_=["eventsethalftime"])[0],
-                                                           games_soup[j].find_all("ol",class_=["eventset2"])[0],
+                output[i][output_index]["host_yellow_card_data"] = sporza_scrape_function(games_finished_soup[j].find_all("ol",class_=["eventset1"])[0],
+                                                           games_finished_soup[j].find_all("ol",class_=["eventsethalftime"])[0],
+                                                           games_finished_soup[j].find_all("ol",class_=["eventset2"])[0],
                                                            "host yellow_card")
-                output[i][output_index]["visitor_yellow_card_data"] = sporza_scrape_function(games_soup[j].find_all("ol",class_=["eventset1"])[0],
-                                                           games_soup[j].find_all("ol",class_=["eventsethalftime"])[0],
-                                                           games_soup[j].find_all("ol",class_=["eventset2"])[0],
+                output[i][output_index]["visitor_yellow_card_data"] = sporza_scrape_function(games_finished_soup[j].find_all("ol",class_=["eventset1"])[0],
+                                                           games_finished_soup[j].find_all("ol",class_=["eventsethalftime"])[0],
+                                                           games_finished_soup[j].find_all("ol",class_=["eventset2"])[0],
                                                            "visitor yellow_card")
 
                 # Red Cards
-                output[i][output_index]["host_red_card_data"] = sporza_scrape_function(games_soup[j].find_all("ol",class_=["eventset1"])[0],
-                                                           games_soup[j].find_all("ol",class_=["eventsethalftime"])[0],
-                                                           games_soup[j].find_all("ol",class_=["eventset2"])[0],
+                output[i][output_index]["host_red_card_data"] = sporza_scrape_function(games_finished_soup[j].find_all("ol",class_=["eventset1"])[0],
+                                                           games_finished_soup[j].find_all("ol",class_=["eventsethalftime"])[0],
+                                                           games_finished_soup[j].find_all("ol",class_=["eventset2"])[0],
                                                            "host red_card")
 
-                output[i][output_index]["visitor_red_card_data"] = sporza_scrape_function(games_soup[j].find_all("ol",class_=["eventset1"])[0],
-                                                           games_soup[j].find_all("ol",class_=["eventsethalftime"])[0],
-                                                           games_soup[j].find_all("ol",class_=["eventset2"])[0],
+                output[i][output_index]["visitor_red_card_data"] = sporza_scrape_function(games_finished_soup[j].find_all("ol",class_=["eventset1"])[0],
+                                                           games_finished_soup[j].find_all("ol",class_=["eventsethalftime"])[0],
+                                                           games_finished_soup[j].find_all("ol",class_=["eventset2"])[0],
                                                            "visitor red_card")
 
                 # Starting Team
-                home_starting_team_dummy = games_soup[j].find_all(class_="GENERIC")[1].get_text().split('\n')[3].split(', ')
+                home_starting_team_dummy = games_finished_soup[j].find_all(class_="GENERIC")[1].get_text().split('\n')[3].split(', ')
                 home_starting_team_dummy[-1] = home_starting_team_dummy[-1][0:-1]
                 output[i][output_index]["host_starting_team"] = '//'.join(home_starting_team_dummy)
 
-                away_starting_team_dummy = games_soup[j].find_all(class_="GENERIC")[0].get_text().split('\n')[3].split(', ')
+                away_starting_team_dummy = games_finished_soup[j].find_all(class_="GENERIC")[0].get_text().split('\n')[3].split(', ')
                 away_starting_team_dummy[-1] = away_starting_team_dummy[-1][0:-1]
                 output[i][output_index]["visitor_starting_team"] = '//'.join(away_starting_team_dummy)
 
                 # Substitutions
-                output[i][output_index]["host_substitution"] = sporza_scrape_function(games_soup[j].find_all("ol",class_=["eventset1"])[0],
-                                                           games_soup[j].find_all("ol",class_=["eventsethalftime"])[0],
-                                                           games_soup[j].find_all("ol",class_=["eventset2"])[0],
+                output[i][output_index]["host_substitution"] = sporza_scrape_function(games_finished_soup[j].find_all("ol",class_=["eventset1"])[0],
+                                                           games_finished_soup[j].find_all("ol",class_=["eventsethalftime"])[0],
+                                                           games_finished_soup[j].find_all("ol",class_=["eventset2"])[0],
                                                            "host inout")
-                output[i][output_index]["visitor_substitution"] = sporza_scrape_function(games_soup[j].find_all("ol",class_=["eventset1"])[0],
-                                                           games_soup[j].find_all("ol",class_=["eventsethalftime"])[0],
-                                                           games_soup[j].find_all("ol",class_=["eventset2"])[0],
+                output[i][output_index]["visitor_substitution"] = sporza_scrape_function(games_finished_soup[j].find_all("ol",class_=["eventset1"])[0],
+                                                           games_finished_soup[j].find_all("ol",class_=["eventsethalftime"])[0],
+                                                           games_finished_soup[j].find_all("ol",class_=["eventset2"])[0],
                                                            "visitor inout")
 
                 # Managers
-                output[i][output_index]["host_manager"] = games_soup[j].find(class_=["coach"]).get_text().replace('\n\xa0\n\n','').split('\n')[0]
-                output[i][output_index]["visitor_manager"] = games_soup[j].find(class_=["coach"]).get_text().replace('\n\xa0\n\n','').split('\n')[1]
+                output[i][output_index]["host_manager"] = games_finished_soup[j].find(class_=["coach"]).get_text().replace('\n\xa0\n\n','').split('\n')[0]
+                output[i][output_index]["visitor_manager"] = games_finished_soup[j].find(class_=["coach"]).get_text().replace('\n\xa0\n\n','').split('\n')[1]
             else:
                 # Just add empty string
                 output[i][output_index]["referee"] = ''
