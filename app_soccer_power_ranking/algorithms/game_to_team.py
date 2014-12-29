@@ -151,7 +151,8 @@ def game_to_team(input_data):
             # Check wins
             if team_data[team_data[i,8],1] < team_data[team_data[i+1,8],1]:
                 # If i+1 has more wins than i, change ranking
-                team_data[team_data[i,8],8],team_data[team_data[i+1,8],8] = team_data[team_data[i+1,8],8],team_data[team_data[i,8],8]
+                # team_data[team_data[i,8],8],team_data[team_data[i+1,8],8] = team_data[team_data[i+1,8],8],team_data[team_data[i,8],8]
+                team_data[i,8],team_data[i+1,8] = team_data[i+1,8],team_data[i,8]
                 continue
             else:
                 # If wins also equal
@@ -159,16 +160,19 @@ def game_to_team(input_data):
                     # Check Goal Difference
                     if team_data[team_data[i,8],6] < team_data[team_data[i+1,8],6]:
                         # If i+1 has better GD than i, change ranking
-                        team_data[team_data[i,8],8],team_data[team_data[i+1,8],8]= team_data[team_data[i+1,8],8],team_data[team_data[i,8],8]
+                        # team_data[team_data[i,8],8],team_data[team_data[i+1,8],8]= team_data[team_data[i+1,8],8],team_data[team_data[i,8],8]
+                        team_data[i,8],team_data[i+1,8] = team_data[i+1,8],team_data[i,8]
                         continue
 
                         # Then by GD
 
                         # Then by GF
+
     # Map indices back to league ranking
     dummy = np.zeros((1,number_of_teams))
     for i in range(len(team_data)):
         dummy[0,team_data[i,8]] = i+1
     team_data[:,8] = dummy
+
     # What does module return?
     return list([team_names[0], game_data, team_data])
