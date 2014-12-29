@@ -4,6 +4,7 @@ import os
 import numpy as np
 
 def populate():
+    # Test Git
     # Remove previous data in table
     import django
     django.setup()
