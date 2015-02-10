@@ -102,6 +102,16 @@
     }
 </script>
 
+<script>
+    function formatTable() {
+        // Centre Rank & Left Team
+        for (i = 1; i <=16; i++) {
+            $("#td_Team_team_" + String(i)).css('text-align','left');
+        }
+
+    }
+
+</script>
 <script type="text/javascript">
     {#On document ready, load stuff#}
     $(document).ready(function(){
@@ -117,6 +127,8 @@
             // sort on the first column (rank), order asc
             sortList:  [[0,0],[2,0]]
         });
+
+        formatTable();
     });
 </script>
 
@@ -248,7 +260,7 @@
 
             $('#' + google_chart_img_i.id).qtip({
                 style: {
-                    classes: 'qtip-red'
+                    classes: 'qtip-light qtip-tipsy'
                 },
                 position: {
                     target: 'mouse', // Track the mouse as the positioning target

@@ -106,7 +106,8 @@ class game_data(models.Model):
     #                           output[season][game]["host_manager"]
     #                           output[season][game]["visitor_manager"]
     #                           output[season][game]["minute_x"] with x from 1 tot 90
-    game_date = models.DateField() # ["%d/%m/%Y"], default=datetime.now().strftime("%d/%m/%Y")
+    # game_date = models.DateField() # ["%d/%m/%Y"], default=datetime.now().strftime("%d/%m/%Y")
+    game_date = models.DateField()
     game_hour = models.TextField(default='')
     host = models.TextField(default='')
     visitor = models.TextField(default='')

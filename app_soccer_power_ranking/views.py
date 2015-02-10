@@ -162,7 +162,7 @@ def game_table(request):
     import datetime
     # Standard Ranking
     # Select Game
-    game = game_data.objects.filter(id="18850")
+    game = game_data.objects.filter(id="25100")
 
     game_headers = ["Date","Host", "Visitor", "Host Win %", "Tie %", "Visitor Win %"]
     game_values = list()

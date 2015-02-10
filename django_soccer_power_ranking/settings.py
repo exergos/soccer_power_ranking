@@ -56,16 +56,26 @@ WSGI_APPLICATION = 'django_soccer_power_ranking.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'NAME': 'soccer_power_ranking',
+#         'ENGINE': 'mysql.connector.django',
+#         'USER': 'root',
+#         'PASSWORD': 'Will0870',
+#         'HOST': 'EXERGOS-PC',
+#         'OPTIONS': {
+#           'autocommit': True,
+#         },
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'NAME': 'soccer_power_ranking',
-        'ENGINE': 'mysql.connector.django',
-        'USER': 'root',
-        'PASSWORD': 'Will0870',
-        'HOST': 'EXERGOS-PC',
-        'OPTIONS': {
-          'autocommit': True,
-        },
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'dctmfgvdrdled0',
+        'USER': 'orlmfrokadzras',
+        'PASSWORD': 'XZS2N1h6D-jDyNAbuRUpg1Uk8g',
+        'HOST': 'ec2-54-228-227-13.eu-west-1.compute.amazonaws.com'
     }
 }
 

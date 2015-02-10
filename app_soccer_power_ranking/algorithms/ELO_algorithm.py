@@ -255,7 +255,6 @@ def upset(input_data):
                     rh = np.array([0,0,upset3])
                     coeff = np.linalg.solve(lh,rh)
 
-
                 input_data[0][i]["upset"] = (1-host_win)/host_win + coeff[0]*gd**2 + coeff[1]*gd + coeff[2]
 
             # visitor win
