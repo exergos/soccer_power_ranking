@@ -7,7 +7,6 @@ https://docs.djangoproject.com/en/1.7/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -21,9 +20,109 @@ SECRET_KEY = '-(b79id^=!!x&!7x6ld3798+e5r6ny60o$_6lg3^i9q&)x+&8)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+if DEBUG:
+    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+    # Static files (CSS, JavaScript, Images)
+    # https://docs.djangoproject.com/en/1.7/howto/static-files/
+    STATIC_PATH = os.path.join(BASE_DIR, 'static')
+
+    # Define STATIC_ROOT for apps that compress all static files into 1
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+    STATIC_URL = '/static/'
+
+    STATICFILES_DIRS = [
+        STATIC_PATH,
+        ]
+
+    TEMPLATE_PATH = os.path.join(BASE_DIR, 'templates')
+
+    TEMPLATE_DIRS = [
+        TEMPLATE_PATH,
+        ]
+    # Database
+    # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
+
+    # DATABASES = {
+    #     'default': {
+    #         'NAME': 'soccer_power_ranking',
+    #         'ENGINE': 'mysql.connector.django',
+    #         'USER': 'root',
+    #         'PASSWORD': 'Will0870',
+    #         'HOST': 'EXERGOS-PC',
+    #         'OPTIONS': {
+    #           'autocommit': True,
+    #         },
+    #     }
+    # }
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'dctmfgvdrdled0',
+            'USER': 'orlmfrokadzras',
+            'PASSWORD': 'XZS2N1h6D-jDyNAbuRUpg1Uk8g',
+            'HOST': 'ec2-54-228-227-13.eu-west-1.compute.amazonaws.com'
+        }
+    }
+
+    STATICFILES_FINDERS = (
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    )
+
+    ALLOWED_HOSTS = []
+
+else:
+    # HEROKU PRODUCTION
+    # Static files (CSS, JavaScript, Images)
+    # https://docs.djangoproject.com/en/1.7/howto/static-files/
+
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    # If collectstatic is used when uploading to heroku, use staticfiles root
+    STATIC_ROOT = 'staticfiles'
+    STATIC_URL = '/static/'
+
+    STATICFILES_DIRS = (
+        os.path.join(os.path.dirname(BASE_DIR), 'static'),
+    )
+    # Simplified static file serving.
+    # https://warehouse.python.org/project/whitenoise/
+
+    STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+    TEMPLATE_PATH = os.path.join(os.path.dirname(BASE_DIR), 'templates')
+
+    TEMPLATE_DIRS = [
+        TEMPLATE_PATH,
+        ]
+
+    # Production database
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'dctmfgvdrdled0',
+            'USER': 'orlmfrokadzras',
+            'PASSWORD': 'XZS2N1h6D-jDyNAbuRUpg1Uk8g',
+            'HOST': 'ec2-54-228-227-13.eu-west-1.compute.amazonaws.com'
+        }
+    }
+
+    STATICFILES_FINDERS = (
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    )
+
+    # Allow all host headers
+    ALLOWED_HOSTS = ['*']
+
+
+
+
+TEMPLATE_DEBUG = True
 
 
 # Application definition
@@ -36,6 +135,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app_soccer_power_ranking',
+
+    # gunicorn, for heroku deployment
+    # "gunicorn",
 )
 
 MIDDLEWARE_CLASSES = (
@@ -53,32 +155,6 @@ ROOT_URLCONF = 'django_soccer_power_ranking.urls'
 WSGI_APPLICATION = 'django_soccer_power_ranking.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.7/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'NAME': 'soccer_power_ranking',
-#         'ENGINE': 'mysql.connector.django',
-#         'USER': 'root',
-#         'PASSWORD': 'Will0870',
-#         'HOST': 'EXERGOS-PC',
-#         'OPTIONS': {
-#           'autocommit': True,
-#         },
-#     }
-# }
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'dctmfgvdrdled0',
-        'USER': 'orlmfrokadzras',
-        'PASSWORD': 'XZS2N1h6D-jDyNAbuRUpg1Uk8g',
-        'HOST': 'ec2-54-228-227-13.eu-west-1.compute.amazonaws.com'
-    }
-}
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
@@ -91,19 +167,3 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.7/howto/static-files/
-STATIC_PATH = os.path.join(BASE_DIR, 'static')
-
-STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-    STATIC_PATH,
-]
-
-TEMPLATE_PATH = os.path.join(BASE_DIR, 'templates')
-TEMPLATE_DIRS = [
-    TEMPLATE_PATH,
-]

@@ -2,40 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1a0f2715-b201-42aa-abd9-e20d201e036e" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/images/Team Logos/AA Gent.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/images/Team Logos/Anderlecht.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/images/Team Logos/Cercle Brugge.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/images/Team Logos/Charleroi.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/images/Team Logos/Club Brugge.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/images/Team Logos/KV Mechelen.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/images/Team Logos/Kortrijk.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/images/Team Logos/Lierse SK.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/images/Team Logos/Lokeren.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/images/Team Logos/Moeskroen-Péruwelz.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/images/Team Logos/Oostende.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/images/Team Logos/Racing Genk.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/images/Team Logos/Standard.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/images/Team Logos/Waasland-Beveren.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/images/Team Logos/Westerlo.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/static/images/Team Logos/Zulte Waregem.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app_soccer_power_ranking/algorithms/data/sporza.p" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app_soccer_power_ranking/algorithms/data/sporza_8_seasons.p" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app_soccer_power_ranking/algorithms/data/sporza_actual_season.p" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/.name" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/staticfiles/humans.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace (1).xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="DELETED" beforePath="C:\Users\Willem Lenaerts\Google Drive\Sports Analytics\Soccer Power Ranking\django_soccer_power_ranking\app_soccer_power_ranking\migrations\0001_initial.py" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app_soccer_power_ranking/algorithms/ELO_algorithm.py" afterPath="$PROJECT_DIR$/app_soccer_power_ranking/algorithms/ELO_algorithm.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app_soccer_power_ranking/algorithms/data/sporza.p" afterPath="$PROJECT_DIR$/app_soccer_power_ranking/algorithms/data/sporza.p" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/django_soccer_power_ranking.iml" afterPath="$PROJECT_DIR$/.idea/django_soccer_power_ranking.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app_soccer_power_ranking/models.py" afterPath="$PROJECT_DIR$/app_soccer_power_ranking/models.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/populate_db.py" afterPath="$PROJECT_DIR$/populate_db.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/app_soccer_power_ranking/ranking.html" afterPath="$PROJECT_DIR$/templates/app_soccer_power_ranking/ranking.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/django_soccer_power_ranking/settings.py" afterPath="$PROJECT_DIR$/django_soccer_power_ranking/settings.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/static/css/style.css" afterPath="$PROJECT_DIR$/static/css/style.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app_soccer_power_ranking/urls.py" afterPath="$PROJECT_DIR$/app_soccer_power_ranking/urls.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app_soccer_power_ranking/views.py" afterPath="$PROJECT_DIR$/app_soccer_power_ranking/views.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/django_soccer_power_ranking/wsgi.py" afterPath="$PROJECT_DIR$/django_soccer_power_ranking/wsgi.py" />
     </list>
     <ignored path="django_soccer_power_ranking.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -51,7 +23,7 @@
     <SUITE FILE_PATH="coverage/django_soccer_power_ranking$sporza.coverage" NAME="sporza Coverage Results" MODIFIED="1418150056630" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app_soccer_power_ranking/algorithms" />
     <SUITE FILE_PATH="coverage/django_soccer_power_ranking$app_soccer_power_ranking_extra_templates.coverage" NAME="app_soccer_power_ranking_extra_templates Coverage Results" MODIFIED="1417914096302" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app_soccer_power_ranking/templatetags" />
     <SUITE FILE_PATH="coverage/django_soccer_power_ranking$montecarlo.coverage" NAME="montecarlo Coverage Results" MODIFIED="1417893762735" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app_soccer_power_ranking/algorithms" />
-    <SUITE FILE_PATH="coverage/django_soccer_power_ranking$populate_db.coverage" NAME="populate_db Coverage Results" MODIFIED="1423551435303" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/django_soccer_power_ranking$populate_db.coverage" NAME="populate_db Coverage Results" MODIFIED="1423564504990" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/django_soccer_power_ranking$ELO_algorithm.coverage" NAME="ELO_algorithm Coverage Results" MODIFIED="1417893756886" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app_soccer_power_ranking/algorithms" />
     <SUITE FILE_PATH="coverage/django_soccer_power_ranking$models.coverage" NAME="models Coverage Results" MODIFIED="1418548403939" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app_soccer_power_ranking" />
   </component>
@@ -70,58 +42,38 @@
       <file leaf-file-name="settings.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/django_soccer_power_ranking/settings.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1173" max-vertical-offset="1955">
-              <caret line="33" column="31" selection-start-line="33" selection-start-column="31" selection-end-line="33" selection-end-column="31" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1582" max-vertical-offset="2975">
+              <caret line="121" column="0" selection-start-line="121" selection-start-column="0" selection-end-line="121" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="humans.txt" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/staticfiles/humans.txt">
+      <file leaf-file-name="wsgi.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/django_soccer_power_ranking/wsgi.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="102">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="models.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/models.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="51" max-vertical-offset="2601">
-              <caret line="109" column="34" selection-start-line="109" selection-start-column="34" selection-end-line="109" selection-end-column="34" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="0001_initial.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/migrations/0001_initial.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="8456" max-vertical-offset="8891">
-              <caret line="11" column="18" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="sporza.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/sporza.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="765" max-vertical-offset="9911">
-              <caret line="54" column="124" selection-start-line="52" selection-start-column="12" selection-end-line="54" selection-end-column="124" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="493">
+              <caret line="7" column="3" selection-start-line="7" selection-start-column="3" selection-end-line="7" selection-end-column="3" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name="urls.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/django_soccer_power_ranking/urls.py">
+        <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="272">
-              <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="187">
+              <caret line="6" column="18" selection-start-line="6" selection-start-column="18" selection-end-line="6" selection-end-column="18" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="views.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/views.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4165">
+              <caret line="33" column="52" selection-start-line="33" selection-start-column="52" selection-end-line="33" selection-end-column="52" />
               <folding />
             </state>
           </provider>
@@ -130,28 +82,48 @@
       <file leaf-file-name="populate_db.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/populate_db.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="204" max-vertical-offset="2278">
-              <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2278">
+              <caret line="63" column="9" selection-start-line="63" selection-start-column="9" selection-end-line="63" selection-end-column="9" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ELO_algorithm.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/ELO_algorithm.py">
+      <file leaf-file-name="SPI_algorithm.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/SPI_algorithm.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="4241" max-vertical-offset="5321">
-              <caret line="259" column="25" selection-start-line="259" selection-start-column="25" selection-end-line="259" selection-end-column="25" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="3872" max-vertical-offset="4420">
+              <caret line="242" column="37" selection-start-line="242" selection-start-column="37" selection-end-line="242" selection-end-column="37" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="montecarlo.py" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="urls.py" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/django_soccer_power_ranking/urls.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.29462737" vertical-offset="0" max-vertical-offset="577">
+              <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="montecarlo.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/montecarlo.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.4526559" vertical-offset="1275" max-vertical-offset="8296">
-              <caret line="38" column="22" selection-start-line="38" selection-start-column="22" selection-end-line="38" selection-end-column="22" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="3672" max-vertical-offset="8296">
+              <caret line="244" column="67" selection-start-line="244" selection-start-column="67" selection-end-line="244" selection-end-column="67" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="game_to_team.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/game_to_team.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="663" max-vertical-offset="3128">
+              <caret line="47" column="29" selection-start-line="47" selection-start-column="29" selection-end-line="47" selection-end-column="29" />
               <folding />
             </state>
           </provider>
@@ -197,9 +169,10 @@
         <option value="$PROJECT_DIR$/static/css/style.css" />
         <option value="$PROJECT_DIR$/app_soccer_power_ranking/views.py" />
         <option value="$PROJECT_DIR$/app_soccer_power_ranking/urls.py" />
-        <option value="$PROJECT_DIR$/django_soccer_power_ranking/settings.py" />
-        <option value="$PROJECT_DIR$/populate_db.py" />
         <option value="$PROJECT_DIR$/app_soccer_power_ranking/models.py" />
+        <option value="$PROJECT_DIR$/populate_db.py" />
+        <option value="$PROJECT_DIR$/django_soccer_power_ranking/wsgi.py" />
+        <option value="$PROJECT_DIR$/django_soccer_power_ranking/settings.py" />
       </list>
     </option>
   </component>
@@ -242,15 +215,9 @@
               <option name="myItemId" value="django_soccer_power_ranking" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
-          </PATH>
-          <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="django_soccer_power_ranking" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="django_soccer_power_ranking" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+              <option name="myItemId" value="External Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -260,74 +227,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="django_soccer_power_ranking" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="staticfiles" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="django_soccer_power_ranking" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="django_soccer_power_ranking" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="django_soccer_power_ranking" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="django_soccer_power_ranking" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="django_soccer_power_ranking" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app_soccer_power_ranking" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="django_soccer_power_ranking" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="django_soccer_power_ranking" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app_soccer_power_ranking" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="migrations" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="django_soccer_power_ranking" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="django_soccer_power_ranking" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app_soccer_power_ranking" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="algorithms" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -429,7 +328,7 @@
       <recent name="C:\Users\Willem Lenaerts\Google Drive\Sports Analytics\Soccer Power Ranking\django_soccer_power_ranking" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.populate_db">
+  <component name="RunManager" selected="Django server.django_soccer_power_ranking">
     <configuration default="false" name="chart.html (1)" type="JavascriptDebugType" factoryName="JavaScript Debug" temporary="true" uri="http://localhost:8000/app_soccer_power_ranking/chart/">
       <RunnerSettings RunnerId="JavascriptDebugRunner" />
       <ConfigurationWrapper RunnerId="JavascriptDebugRunner" />
@@ -842,11 +741,11 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297619" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24973376" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2603834" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27860963" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.36426118" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.109770805" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="top" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.46332946" sideWeight="0.8095238" order="0" side_tool="true" content_ui="tabs" x="271" y="201" width="1104" height="721" />
+      <window_info id="Run" active="false" anchor="top" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28235295" sideWeight="0.8095238" order="0" side_tool="true" content_ui="tabs" x="271" y="201" width="1104" height="721" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.19014084" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -927,6 +826,53 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/migrations/0001_initial.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="187" max-vertical-offset="8925">
+          <caret line="11" column="18" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/sporza.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="765" max-vertical-offset="9911">
+          <caret line="54" column="124" selection-start-line="52" selection-start-column="12" selection-end-line="54" selection-end-column="124" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/django_soccer_power_ranking/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="187" max-vertical-offset="289">
+          <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/populate_db.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="442" max-vertical-offset="2295">
+          <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/ELO_algorithm.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="4241" max-vertical-offset="5321">
+          <caret line="259" column="25" selection-start-line="259" selection-start-column="25" selection-end-line="259" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/montecarlo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1275" max-vertical-offset="8296">
+          <caret line="38" column="22" selection-start-line="38" selection-start-column="22" selection-end-line="38" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/SPI_algorithm.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="2091" max-vertical-offset="4097">
@@ -1010,13 +956,6 @@
     <entry file="file://$PROJECT_DIR$/static/images/Team Logos/Cercle Brugge.png">
       <provider selected="true" editor-type-id="images">
         <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/django_soccer_power_ranking/wsgi.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="421">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/manage.py">
@@ -1108,20 +1047,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/SPI_algorithm.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="3978" max-vertical-offset="4420">
-          <caret line="249" column="91" selection-start-line="35" selection-start-column="4" selection-end-line="249" selection-end-column="91" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/game_to_team.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2822" max-vertical-offset="3128">
-          <caret line="166" column="18" selection-start-line="166" selection-start-column="18" selection-end-line="166" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/app_soccer_power_ranking/ranking.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1819" max-vertical-offset="5389">
@@ -1136,10 +1061,79 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/views.py">
+    <entry file="file://$USER_HOME$/soccer_power_ranking_venv/Lib/site-packages/psycopg2/psycopg1.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="612" max-vertical-offset="1921">
-          <caret line="13" column="25" selection-start-line="13" selection-start-column="25" selection-end-line="13" selection-end-column="25" />
+        <state vertical-scroll-proportion="-2.5334873" vertical-offset="1199" max-vertical-offset="1632">
+          <caret line="6" column="44" selection-start-line="6" selection-start-column="44" selection-end-line="6" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/staticfiles/humans.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="418">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/migrations/0001_initial.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="8456" max-vertical-offset="8891">
+          <caret line="11" column="18" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/sporza.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="765" max-vertical-offset="9911">
+          <caret line="59" column="41" selection-start-line="59" selection-start-column="41" selection-end-line="59" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/ELO_algorithm.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2771" max-vertical-offset="5321">
+          <caret line="283" column="27" selection-start-line="283" selection-start-column="27" selection-end-line="283" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="51" max-vertical-offset="2601">
+          <caret line="8" column="37" selection-start-line="8" selection-start-column="37" selection-end-line="8" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/game_to_team.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="663" max-vertical-offset="3128">
+          <caret line="47" column="29" selection-start-line="47" selection-start-column="29" selection-end-line="47" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/SPI_algorithm.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="3872" max-vertical-offset="4420">
+          <caret line="242" column="37" selection-start-line="242" selection-start-column="37" selection-end-line="242" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Downloads/montecarlo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-6.638686" vertical-offset="3774" max-vertical-offset="8296">
+          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/montecarlo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="3672" max-vertical-offset="8296">
+          <caret line="244" column="67" selection-start-line="244" selection-start-column="67" selection-end-line="244" selection-end-column="67" />
           <folding />
         </state>
       </provider>
@@ -1152,81 +1146,50 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/soccer_power_ranking_venv/Lib/site-packages/psycopg2/psycopg1.py">
+    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.5334873" vertical-offset="1199" max-vertical-offset="1632">
-          <caret line="6" column="44" selection-start-line="6" selection-start-column="44" selection-end-line="6" selection-end-column="44" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/staticfiles/humans.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="418">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/django_soccer_power_ranking/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="272">
-          <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4165">
+          <caret line="33" column="52" selection-start-line="33" selection-start-column="52" selection-end-line="33" selection-end-column="52" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/django_soccer_power_ranking/settings.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1173" max-vertical-offset="1955">
-          <caret line="33" column="31" selection-start-line="33" selection-start-column="31" selection-end-line="33" selection-end-column="31" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1582" max-vertical-offset="2975">
+          <caret line="121" column="0" selection-start-line="121" selection-start-column="0" selection-end-line="121" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/models.py">
+    <entry file="file://$PROJECT_DIR$/requirements.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="51" max-vertical-offset="2601">
-          <caret line="109" column="34" selection-start-line="109" selection-start-column="34" selection-end-line="109" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/migrations/0001_initial.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="8456" max-vertical-offset="8891">
-          <caret line="11" column="18" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
+        <state vertical-scroll-proportion="0.17677642" vertical-offset="0" max-vertical-offset="577">
+          <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/populate_db.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="204" max-vertical-offset="2278">
-          <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2278">
+          <caret line="63" column="9" selection-start-line="63" selection-start-column="9" selection-end-line="63" selection-end-column="9" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/ELO_algorithm.py">
+    <entry file="file://$PROJECT_DIR$/django_soccer_power_ranking/wsgi.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="4241" max-vertical-offset="5321">
-          <caret line="259" column="25" selection-start-line="259" selection-start-column="25" selection-end-line="259" selection-end-column="25" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="493">
+          <caret line="7" column="3" selection-start-line="7" selection-start-column="3" selection-end-line="7" selection-end-column="3" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/sporza.py">
+    <entry file="file://$PROJECT_DIR$/django_soccer_power_ranking/urls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="765" max-vertical-offset="9911">
-          <caret line="54" column="124" selection-start-line="52" selection-start-column="12" selection-end-line="54" selection-end-column="124" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app_soccer_power_ranking/algorithms/montecarlo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.4526559" vertical-offset="1275" max-vertical-offset="8296">
-          <caret line="38" column="22" selection-start-line="38" selection-start-column="22" selection-end-line="38" selection-end-column="22" />
+        <state vertical-scroll-proportion="0.29462737" vertical-offset="0" max-vertical-offset="577">
+          <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
           <folding />
         </state>
       </provider>
